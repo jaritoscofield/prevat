@@ -440,13 +440,21 @@ class EvidenceRepository
             // Criar diretório base se não existir
             $baseDir = public_path('storage/evidences');
             if (!is_dir($baseDir)) {
-                mkdir($baseDir, 0755, true);
+                if (!mkdir($baseDir, 0775, true)) {
+                    \Log::error('Falha ao criar diretório base: ' . $baseDir);
+                    throw new \Exception('Falha ao criar diretório base');
+                }
+                chmod($baseDir, 0775);
             }
 
             // Criar diretório específico para a evidência
             $evidenceDir = $baseDir . '/' . $evidenceDB['id'];
             if (!is_dir($evidenceDir)) {
-                mkdir($evidenceDir, 0755, true);
+                if (!mkdir($evidenceDir, 0775, true)) {
+                    \Log::error('Falha ao criar diretório da evidência: ' . $evidenceDir);
+                    throw new \Exception('Falha ao criar diretório da evidência');
+                }
+                chmod($evidenceDir, 0775);
             }
 
             // Caminho completo do arquivo
@@ -455,6 +463,13 @@ class EvidenceRepository
 
             // Salvar o PDF
             $pdf->save($fullPath);
+            chmod($fullPath, 0664);
+
+            // Verificar se o arquivo foi criado
+            if (!file_exists($fullPath)) {
+                \Log::error('Falha ao salvar o arquivo PDF: ' . $fullPath);
+                throw new \Exception('Falha ao salvar o arquivo PDF');
+            }
 
             // Atualizar o caminho no banco de dados
             $evidenceDB->update([
@@ -470,10 +485,11 @@ class EvidenceRepository
 
         } catch (\Exception $exception) {
             \Log::error('Erro ao gerar PDF: ' . $exception->getMessage());
+            \Log::error('Stack trace: ' . $exception->getTraceAsString());
             return [
                 'status' => 'error',
                 'code' => 400,
-                'message' => 'Erro ao gerar PDF'
+                'message' => 'Erro ao gerar PDF: ' . $exception->getMessage()
             ];
         }
     }
