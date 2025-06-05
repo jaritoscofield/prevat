@@ -29,7 +29,7 @@ class Table extends Component
 
         if($evidenceReturnDB['status'] == 'success') {
             $this->sendNotificationSuccess('Sucesso', $evidenceReturnDB['message']);
-            return response()->download(storage_path($evidenceReturnDB['data']['file_path']));
+            return response()->download(public_path('storage/' . $evidenceReturnDB['data']['file_path']));
         } elseif ($evidenceReturnDB['status'] == 'error') {
             $this->sendNotificationDanger('Erro', $evidenceReturnDB['message']);
         }

@@ -281,16 +281,29 @@ class ParticipantRepository
 
         $pdf = Pdf::loadView('admin.pdf.list_participants', $data)->setPaper('a4', 'landscape');
 
-        Storage::disk('public')->makeDirectory('lista-participantes/'.$scheduleCompanyDB['schedule_prevat_id']);
-
-        $path = 'app/public/lista-participantes/'.$scheduleCompanyDB['schedule_prevat_id'].'/lista_'.strtr($scheduleCompanyDB['schedule']['training']['name'], [" " => "_", "ª" => "", "-"=> ""]).'.pdf';
-
-        if(Storage::exists('public/'.$path)) {
-            Storage::delete('public/'.$path);
+        // Create directory path
+        $directory = 'lista-participantes/' . $scheduleCompanyDB['schedule_prevat_id'];
+        $fullDirectory = storage_path('app/public/' . $directory);
+        
+        // Create directory if it doesn't exist
+        if (!file_exists($fullDirectory)) {
+            mkdir($fullDirectory, 0755, true);
         }
 
-        $pdf->save(storage_path($path));
+        // Generate safe filename
+        $filename = 'lista_' . preg_replace('/[^a-zA-Z0-9_]/', '_', $scheduleCompanyDB['schedule']['training']['name']) . '.pdf';
+        $path = $directory . '/' . $filename;
+        $fullPath = storage_path('app/public/' . $path);
 
+        // Delete existing file if it exists
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+        }
+
+        // Save the PDF
+        $pdf->save($fullPath);
+
+        // Update the database with the relative path
         $scheduleCompanyDB['schedule']->update(['file_presence' => $path]);
     }
 

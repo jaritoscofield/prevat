@@ -381,17 +381,29 @@ class TrainingCertificationsRepository
             $pdf = Pdf::loadView('admin.pdf.programmatic_03', $data)->setPaper('A4', 'landscape')->setOption(['defaultFont'=> 'arial']);
         }
 
-
-        Storage::disk('public')->makeDirectory('conteudo-programatico/'.$trainingParticipationDB['id']);
-
-        $path = 'app/public/conteudo-programatico/'.$trainingParticipationDB['id'].'/'.strtr($trainingParticipationDB['schedule_prevat']['training']['name'], [" " => "_", "ª" => "", "-"=> ""]).'.pdf';
-
-        if(Storage::exists('public/'.$path)) {
-            Storage::delete('public/'.$path);
+        // Create directory path
+        $directory = 'conteudo-programatico/' . $trainingParticipationDB['id'];
+        $fullDirectory = storage_path('app/public/' . $directory);
+        
+        // Create directory if it doesn't exist
+        if (!file_exists($fullDirectory)) {
+            mkdir($fullDirectory, 0755, true);
         }
 
-        $pdf->save(storage_path($path));
+        // Generate safe filename
+        $filename = preg_replace('/[^a-zA-Z0-9_]/', '_', $trainingParticipationDB['schedule_prevat']['training']['name']) . '.pdf';
+        $path = $directory . '/' . $filename;
+        $fullPath = storage_path('app/public/' . $path);
 
+        // Delete existing file if it exists
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
+        }
+
+        // Save the PDF
+        $pdf->save($fullPath);
+
+        // Update the database with the relative path
         $trainingParticipationDB->update(['file_programmatic' => $path]);
 
         return [

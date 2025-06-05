@@ -13,6 +13,7 @@ use App\Services\ReferenceService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Exception;
 
@@ -346,11 +347,14 @@ class EvidenceRepository
             ];
 
         } catch (\Exception $exception) {
-
+            DB::rollback();
+            \Log::error('Error generating evidence: ' . $exception->getMessage());
+            \Log::error('Stack trace: ' . $exception->getTraceAsString());
+            
             return [
                 'status' => 'error',
                 'code' => 400,
-                'message' => 'Erro na requisição !'
+                'message' => 'Erro na requisição: ' . $exception->getMessage()
             ];
         }
     }
@@ -397,56 +401,81 @@ class EvidenceRepository
 
     public function generateCertificatesPDF($evidence_id)
     {
-        $evidenceDB = Evidence::query()->withoutGlobalScopes()->find($evidence_id);
+        try {
+            $evidenceDB = Evidence::query()->withoutGlobalScopes()->find($evidence_id);
 
-        $trainingCertificatesDB = TrainingCertificates::query()->with([
-            'training_participation.schedule_prevat.workload',
-            'training_participation.schedule_prevat.location',
-            'training_participation.schedule_prevat.room',
-            'training_participation.schedule_prevat.first_time',
-            'training_participation.schedule_prevat.second_time',
-            'company',
-            'training',
-            'participant' => fn($query) => $query->withoutGlobalScopes()])
-            ->where('training_participation_id', $evidenceDB['training_participation_id'])
-            ->where('company_id', $evidenceDB['company_id'])
-            ->whereHas('participant', function($query) use ($evidenceDB){
-                $query->withoutGlobalScopes()->where('contract_id', $evidenceDB['contract_id']);
-            })
-            ->get();
+            $trainingCertificatesDB = TrainingCertificates::query()->with([
+                'training_participation.schedule_prevat.workload',
+                'training_participation.schedule_prevat.location',
+                'training_participation.schedule_prevat.room',
+                'training_participation.schedule_prevat.first_time',
+                'training_participation.schedule_prevat.second_time',
+                'company',
+                'training',
+                'participant' => fn($query) => $query->withoutGlobalScopes()])
+                ->where('training_participation_id', $evidenceDB['training_participation_id'])
+                ->where('company_id', $evidenceDB['company_id'])
+                ->whereHas('participant', function($query) use ($evidenceDB){
+                    $query->withoutGlobalScopes()->where('contract_id', $evidenceDB['contract_id']);
+                })
+                ->get();
 
+            $trainingParticipationDB = TrainingParticipations::query()->with(['schedule_prevat.training', 'professionals', 'participants.participant' => fn ($query) => $query->withoutGlobalScopes()])->find($evidenceDB['training_participation_id']);
 
-        $trainingParticipationDB = TrainingParticipations::query()->with(['schedule_prevat.training', 'professionals', 'participants.participant' => fn ($query) => $query->withoutGlobalScopes()])->find($evidenceDB['training_participation_id']);
+            $data = ['certifications' => $trainingCertificatesDB, 'professionals' => $trainingParticipationDB, 'professionalsProgramatic' => $trainingParticipationDB['professionals'], 'content' => $trainingParticipationDB['schedule_prevat'],
+                'participants' => $trainingParticipationDB['participants']];
 
-        $data = ['certifications' => $trainingCertificatesDB, 'professionals' => $trainingParticipationDB, 'professionalsProgramatic' => $trainingParticipationDB['professionals'], 'content' => $trainingParticipationDB['schedule_prevat'],
-            'participants' => $trainingParticipationDB['participants']];
+            if($trainingParticipationDB['template_id'] == 1) {
+                $pdf = Pdf::loadView('admin.pdf.evidence_certificates', $data)->setPaper('a4', 'landscape');
+            } elseif ($trainingParticipationDB['template_id'] == 2) {
+                $pdf = Pdf::loadView('admin.pdf.evidence_certificates_02', $data)->setPaper('a4', 'landscape');
+            } else {
+                $pdf = Pdf::loadView('admin.pdf.evidence_certificates_03', $data)->setPaper('a4', 'landscape');
+            }
 
-        if($trainingParticipationDB['template_id'] == 1) {
-            $pdf = Pdf::loadView('admin.pdf.evidence_certificates', $data)->setPaper('a4', 'landscape');
-        } elseif ($trainingParticipationDB['template_id'] == 2) {
-            $pdf = Pdf::loadView('admin.pdf.evidence_certificates_02', $data)->setPaper('a4', 'landscape');
-        } elseif ($trainingParticipationDB['template_id'] == 3) {
-            $pdf = Pdf::loadView('admin.pdf.evidence_certificates_03', $data)->setPaper('a4', 'landscape');
+            // Criar nome do arquivo seguro
+            $fileName = preg_replace('/[^a-zA-Z0-9_]/', '_', $trainingParticipationDB['schedule_prevat']['training']['name']);
+            $fileName = 'certificados_' . $fileName . '.pdf';
+
+            // Criar diretório base se não existir
+            $baseDir = public_path('storage/evidences');
+            if (!is_dir($baseDir)) {
+                mkdir($baseDir, 0755, true);
+            }
+
+            // Criar diretório específico para a evidência
+            $evidenceDir = $baseDir . '/' . $evidenceDB['id'];
+            if (!is_dir($evidenceDir)) {
+                mkdir($evidenceDir, 0755, true);
+            }
+
+            // Caminho completo do arquivo
+            $filePath = 'evidences/' . $evidenceDB['id'] . '/' . $fileName;
+            $fullPath = public_path('storage/' . $filePath);
+
+            // Salvar o PDF
+            $pdf->save($fullPath);
+
+            // Atualizar o caminho no banco de dados
+            $evidenceDB->update([
+                'file_path' => $filePath
+            ]);
+
+            return [
+                'status' => 'success',
+                'data' => $evidenceDB,
+                'code' => 200,
+                'message' => 'PDF gerado com sucesso!'
+            ];
+
+        } catch (\Exception $exception) {
+            \Log::error('Erro ao gerar PDF: ' . $exception->getMessage());
+            return [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Erro ao gerar PDF'
+            ];
         }
-
-        Storage::disk('public')->makeDirectory('evidences/'.$evidenceDB['id']);
-
-        $path = 'app/public/evidences/'.$evidenceDB['id'].'/certificados_'.strtr($trainingParticipationDB['schedule_prevat']['training']['name'], [" " => "_", "ª" => "", "-"=> ""]).'.pdf';
-
-        if(Storage::exists('public/'.$path)) {
-            Storage::delete('public/'.$path);
-        }
-
-        $pdf->save(storage_path($path));
-
-        $evidenceDB->update(['file_path' => $path]);
-
-        return [
-            'status' => 'success',
-            'message' => 'Certificados Gerados com sucesso !',
-            'code' => 200,
-        ];
-
     }
 
 }

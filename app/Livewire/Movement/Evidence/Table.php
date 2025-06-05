@@ -8,6 +8,7 @@ use App\Repositories\Movements\EvidenceRepository;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\Log;
 
 class Table extends Component
 {
@@ -59,8 +60,33 @@ class Table extends Component
     public function downloadPDF($evidence_id)
     {
         $evidenceDB = Evidence::query()->withoutGlobalScopes()->findOrFail($evidence_id);
+        
+        // Log do caminho do arquivo no banco de dados
+        \Log::info('File path from DB: ' . $evidenceDB['file_path']);
+        
+        // Construir o caminho completo usando public_path
+        $fullPath = public_path('storage/' . $evidenceDB['file_path']);
+        
+        // Log do caminho completo
+        \Log::info('Full path: ' . $fullPath);
+        
+        // Verificar se o diretório existe
+        $dirPath = dirname($fullPath);
+        \Log::info('Directory exists: ' . (is_dir($dirPath) ? 'Yes' : 'No'));
+        \Log::info('Directory path: ' . $dirPath);
+        
+        // Listar arquivos no diretório
+        if (is_dir($dirPath)) {
+            \Log::info('Files in directory: ' . implode(', ', scandir($dirPath)));
+        }
+        
+        if (!file_exists($fullPath)) {
+            \Log::error('File not found at path: ' . $fullPath);
+            session()->flash('error', 'Arquivo não encontrado.');
+            return null;
+        }
 
-        return response()->download(storage_path($evidenceDB['file_path']));
+        return response()->download($fullPath);
     }
 
     public function render()
