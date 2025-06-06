@@ -28,6 +28,63 @@
             </a>
         </li>
 
+        @if(auth()->user()->email === 'SASHA.Assuncao@hydro.com')
+        <li class="slide @if(request()->is('movimentacoes/*'))is-expanded @endif">
+            <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                    class="side-menu__icon fa-solid fa-retweet"></i><span
+                    class="side-menu__label">Movimentações</span><i
+                    class="angle fe fe-chevron-right"></i></a>
+            <ul class="slide-menu mega-slide-menu">
+                <li class="panel sidetab-menu">
+                    <div class="panel-body tabs-menu-body p-0 border-0">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="side9">
+                                <ul class="sidemenu-list">
+                                    <li class="side-menu-label1"><a href="javascript:void(0)">Movimentações</a></li>
+                                    <li class="mega-menu">
+                                        <div class="">
+                                            <ul>
+                                                <li><a href="{{route('movement.evidence')}}" class="slide-item @if(request()->is('movimentacoes/evidencia*')) active @endif"> Evidência</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        @endif
+
+        @if(auth()->user()->email === 'SASHA.Assuncao@hydro.com')
+        <li class="sub-category">
+            <h3>Cadastros</h3>
+        </li>
+
+        <li class="slide @if(request()->is('cadastros/*')) is-expanded @endif">
+            <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                    class="side-menu__icon mdi mdi-domain"></i><span
+                    class="side-menu__label">Escopos</span><i
+                    class="angle fe fe-chevron-right"></i></a>
+            <ul class="slide-menu">
+                <li class="panel sidetab-menu">
+                    <div class="panel-body tabs-menu-body p-0 border-0">
+                        <div class="tab-content active">
+                            <div class="tab-pane active">
+                                <ul class="sidemenu-list">
+                                    <li class="side-menu-label1 active"><a href="javascript:void(0)">Escopos</a></li>
+                                    <li><a href="{{route('registration.contractors')}}" class="slide-item @if(request()->is('cadastros/contratos*')) active @endif"> Contratantes</a></li>
+                                    <li><a href="{{route('registration.company')}}" class="slide-item @if(request()->is('cadastros/empresa*')) active @endif"> Empresas</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        @endif
+
         <li class="slide @if(request()->is('relatorios/*'))is-expanded @endif">
             <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
                     class="side-menu__icon fe fe-file-text"></i><span
