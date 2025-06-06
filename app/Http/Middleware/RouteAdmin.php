@@ -16,6 +16,11 @@ class RouteAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Libera para o email específico
+        if (\Illuminate\Support\Facades\Auth::user() && \Illuminate\Support\Facades\Auth::user()->email === 'SASHA.Assuncao@hydro.com') {
+            return $next($request);
+        }
+
         $manager = new CompanyManager();
         $companyAdmin = $manager->isScopeAdmin();
 
