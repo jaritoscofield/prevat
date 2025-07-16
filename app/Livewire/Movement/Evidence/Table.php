@@ -15,7 +15,7 @@ class Table extends Component
     use WithPagination;
 
     public $order = [
-        'column' => 'created_at',
+        'column' => 'date',
         'order' => 'DESC'
     ];
 
@@ -57,6 +57,17 @@ class Table extends Component
         }
     }
 
+    #[On('toggleOrderByDate')]
+    public function toggleOrderByDate()
+    {
+        if ($this->order['column'] === 'date') {
+            $this->order['order'] = $this->order['order'] === 'DESC' ? 'ASC' : 'DESC';
+        } else {
+            $this->order['column'] = 'date';
+            $this->order['order'] = 'DESC';
+        }
+    }
+
     public function downloadPDF($evidence_id)
     {
         $evidenceDB = Evidence::query()->withoutGlobalScopes()->findOrFail($evidence_id);
@@ -93,7 +104,7 @@ class Table extends Component
     {
         $response = new \stdClass();
         $response->evidences = $this->getEvidences();
-
-        return view('livewire.movement.evidence.table', ['response' => $response]);
+        $order = $this->order;
+        return view('livewire.movement.evidence.table', ['response' => $response, 'order' => $order]);
     }
 }

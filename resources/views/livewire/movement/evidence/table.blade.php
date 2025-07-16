@@ -21,7 +21,19 @@
                             <thead class="text-dark">
                             <tr>
                                 <th class="fw-bold fs-12">Referencia</th>
-                                <th class="fw-bold fs-12">Data</th>
+                                <th class="fw-bold fs-12">Data
+                                    <span style="cursor:pointer; margin-left:4px;" wire:click="toggleOrderByDate">
+                                        @if(isset($order) && $order['column'] === 'date')
+                                            @if($order['order'] === 'ASC')
+                                                <i class="fa fa-sort-up text-primary"></i>
+                                            @else
+                                                <i class="fa fa-sort-down text-primary"></i>
+                                            @endif
+                                        @else
+                                            <i class="fa fa-sort text-muted"></i>
+                                        @endif
+                                    </span>
+                                </th>
                                 <th class="fw-bold fs-12">Empresa</th>
                                 <th class="fw-bold fs-12">Treinamento</th>
                                 <th class="fw-bold fs-12" width="40px">Status</th>
