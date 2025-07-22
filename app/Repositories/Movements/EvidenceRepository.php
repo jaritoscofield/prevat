@@ -32,15 +32,18 @@ class EvidenceRepository
                 $evidenceDB->withoutGlobalScopes();
             }
 
+            // CORRIGIDO: Agrupar busca textual em um único where aninhado
             if(isset($filterData['search']) && $filterData['search'] != null) {
-                $evidenceDB->whereHas('training_participation.schedule_prevat.training', function($query) use ($filterData){
-                    $query->where('name', 'LIKE', '%'.$filterData['search'].'%');
-                    $query->orWhere('acronym', 'LIKE', '%'.$filterData['search'].'%');
-                });
-                $evidenceDB->orWhereHas('company', function($query) use ($filterData){
-                    $query->where('name', 'LIKE', '%'.$filterData['search'].'%');
-                    $query->orWhere('fantasy_name', 'LIKE', '%'.$filterData['search'].'%');
-                    $query->orWhere('employer_number', 'LIKE', '%'.$filterData['search'].'%');
+                $evidenceDB->where(function($query) use ($filterData) {
+                    $query->whereHas('training_participation.schedule_prevat.training', function($q) use ($filterData){
+                        $q->where('name', 'LIKE', '%'.$filterData['search'].'%')
+                          ->orWhere('acronym', 'LIKE', '%'.$filterData['search'].'%');
+                    })
+                    ->orWhereHas('company', function($q) use ($filterData){
+                        $q->where('name', 'LIKE', '%'.$filterData['search'].'%')
+                          ->orWhere('fantasy_name', 'LIKE', '%'.$filterData['search'].'%')
+                          ->orWhere('employer_number', 'LIKE', '%'.$filterData['search'].'%');
+                    });
                 });
             }
 
