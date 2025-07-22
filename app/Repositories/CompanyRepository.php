@@ -227,6 +227,13 @@ class CompanyRepository
     {
         $companyDB = Company::query()->orderBy('name', 'ASC');
 
+        // Filtrar pelas empresas do usuário logado se for funcionário
+        if (auth()->user()->type == 'funcionario') {
+            $companyDB->whereHas('participants', function($query) {
+                $query->where('user_id', auth()->id());
+            });
+        }
+
         if($companies) {
             $companyDB->whereIn('id', $companies);
         }
@@ -234,7 +241,6 @@ class CompanyRepository
         $companyDB = $companyDB->get();
 
         $return = [];
-
         foreach ($companyDB as $key => $itemCompany) {
             $return[0]['label'] = 'Escolha';
             $return[0]['value'] = '';
