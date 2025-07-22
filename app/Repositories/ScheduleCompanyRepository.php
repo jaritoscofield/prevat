@@ -26,14 +26,16 @@ class ScheduleCompanyRepository
                 $scheduleCompanyDB->withoutGlobalScopes();
             }
 
+            // CORRIGIDO: Agrupar busca textual em um único where aninhado para funcionar junto com o filtro de empresa
             if(isset($filterData['search']) && $filterData['search'] != null) {
-                $scheduleCompanyDB->whereHas('schedule.training', function($query) use ($filterData){
-                    $query->where('name', 'LIKE', '%'.$filterData['search'].'%');
-                    $query->orWhere('acronym', 'LIKE', '%'.$filterData['search'].'%');
-                });
-
-                $scheduleCompanyDB->orWhereHas('participants.participant', function($query) use ($filterData){
-                    $query->where('name', 'LIKE', '%'.$filterData['search'].'%');
+                $scheduleCompanyDB->where(function($query) use ($filterData) {
+                    $query->whereHas('schedule.training', function($q) use ($filterData){
+                        $q->where('name', 'LIKE', '%'.$filterData['search'].'%')
+                          ->orWhere('acronym', 'LIKE', '%'.$filterData['search'].'%');
+                    })
+                    ->orWhereHas('participants.participant', function($q) use ($filterData){
+                        $q->where('name', 'LIKE', '%'.$filterData['search'].'%');
+                    });
                 });
             }
 

@@ -3,6 +3,12 @@
         <div class="row">
             <div class="col-md-12 col-xl-4">
                 <div class="form-group">
+                    <label class="form-label">Buscar por nome</label>
+                    <input type="text" wire:model="filter.search" class="form-control" placeholder="Digite o nome do participante ou treinamento">
+                </div>
+            </div>
+            <div class="col-md-12 col-xl-4">
+                <div class="form-group">
                     <label class="form-label">Empresas</label>
                     <x-select2 wire:model="filter.company_id" class="form-select select2 select2-show-search">
                         @foreach($response->companies as $itemCompany)
