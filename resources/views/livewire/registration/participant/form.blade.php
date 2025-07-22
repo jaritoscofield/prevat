@@ -125,6 +125,21 @@
                             </div>
                         </div>
 
+                        <!-- Campo de Assinatura -->
+                        <!-- <div class="row mb-4">
+                            <div class="col-md-12 col-xl-6">
+                                <label class="form-label">Assinatura</label>
+                                <div style="border:1px solid #ccc; border-radius:4px; position:relative;">
+                                    <canvas id="signature-pad" width="400" height="150" style="touch-action: none; background: #fff;"></canvas>
+                                    <input type="hidden" wire:model="state.signature" id="signature-input">
+                                </div>
+                                <button type="button" class="btn btn-sm btn-secondary mt-2" id="clear-signature">Limpar Assinatura</button>
+                                @error('signature')
+                                <p class="text-danger">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div> -->
+
                         <button type="submit" class="btn btn-primary"> {{$participant ? 'Atualizar' : 'Cadastrar'}}</button>
                     </form>
 
@@ -152,5 +167,86 @@
             @this.set('selected', data);
             });
         });
+    </script>
+
+    <script>
+        // Assinatura Canvas
+        let canvas = document.getElementById('signature-pad');
+        let signatureInput = document.getElementById('signature-input');
+        if (canvas) {
+            let ctx = canvas.getContext('2d');
+            let drawing = false;
+            let lastPos = { x: 0, y: 0 };
+
+            function getMousePos(canvas, evt) {
+                let rect = canvas.getBoundingClientRect();
+                return {
+                    x: evt.clientX - rect.left,
+                    y: evt.clientY - rect.top
+                };
+            }
+            function getTouchPos(canvas, touch) {
+                let rect = canvas.getBoundingClientRect();
+                return {
+                    x: touch.touches[0].clientX - rect.left,
+                    y: touch.touches[0].clientY - rect.top
+                };
+            }
+            function drawLine(from, to) {
+                ctx.beginPath();
+                ctx.moveTo(from.x, from.y);
+                ctx.lineTo(to.x, to.y);
+                ctx.strokeStyle = '#222';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.closePath();
+            }
+            canvas.addEventListener('mousedown', function(e) {
+                drawing = true;
+                lastPos = getMousePos(canvas, e);
+            });
+            canvas.addEventListener('mousemove', function(e) {
+                if (!drawing) return;
+                let mousePos = getMousePos(canvas, e);
+                drawLine(lastPos, mousePos);
+                lastPos = mousePos;
+            });
+            canvas.addEventListener('mouseup', function() {
+                drawing = false;
+                signatureInput.value = canvas.toDataURL();
+                if (window.Livewire) {
+                    window.Livewire.find(document.querySelector('[wire\:id]').getAttribute('wire:id')).set('state.signature', signatureInput.value);
+                }
+            });
+            canvas.addEventListener('mouseleave', function() {
+                drawing = false;
+            });
+            // Touch events
+            canvas.addEventListener('touchstart', function(e) {
+                drawing = true;
+                lastPos = getTouchPos(canvas, e);
+            });
+            canvas.addEventListener('touchmove', function(e) {
+                if (!drawing) return;
+                let touchPos = getTouchPos(canvas, e);
+                drawLine(lastPos, touchPos);
+                lastPos = touchPos;
+                e.preventDefault();
+            });
+            canvas.addEventListener('touchend', function() {
+                drawing = false;
+                signatureInput.value = canvas.toDataURL();
+                if (window.Livewire) {
+                    window.Livewire.find(document.querySelector('[wire\:id]').getAttribute('wire:id')).set('state.signature', signatureInput.value);
+                }
+            });
+            document.getElementById('clear-signature').addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                signatureInput.value = '';
+                if (window.Livewire) {
+                    window.Livewire.find(document.querySelector('[wire\:id]').getAttribute('wire:id')).set('state.signature', '');
+                }
+            });
+        }
     </script>
 @endsection
