@@ -100,6 +100,11 @@ class Table extends Component
 
     public function downloadPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado = null)
     {
+        \Log::info('Livewire: downloadPDFCustom chamado', [
+            'evidence_id' => $evidence_id,
+            'qrcode_atestado_type' => is_object($qrcode_atestado) ? get_class($qrcode_atestado) : gettype($qrcode_atestado),
+            'qrcode_atestado_exists' => $qrcode_atestado ? 'sim' : 'nao',
+        ]);
         $evidenceRepository = new \App\Repositories\Movements\EvidenceRepository();
         $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado);
         if ($result['status'] === 'success') {
