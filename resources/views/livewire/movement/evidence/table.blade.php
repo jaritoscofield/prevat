@@ -105,7 +105,6 @@
                                                    title="Download">
                                                     <i class="fe fe-download"></i>
                                                 </button>
-                                                <span style="font-size:10px;color:blue;">{{ $nomeCurso }}</span>
                                             @endif
                                         @endif
 

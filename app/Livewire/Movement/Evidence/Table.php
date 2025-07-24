@@ -9,10 +9,11 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
+use Livewire\WithFileUploads;
 
 class Table extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     public $order = [
         'column' => 'date',
