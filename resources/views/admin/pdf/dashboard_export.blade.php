@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Exportação de Dados - Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #222; }
+        h1, h2 { color: #2a4d8f; }
+        .section { margin-bottom: 30px; }
+        .counter {
+            font-size: 2em;
+            color: #fff;
+            background: #2a4d8f;
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            font-size: 0.95em;
+        }
+        th {
+            background: #e6eefa;
+        }
+        .small { font-size: 0.9em; color: #666; }
+    </style>
+</head>
+<body>
+    <h1>Exportação de Dados - Dashboard</h1>
+    <p class="small">Período: {{ \Carbon\Carbon::parse($start)->format('d/m/Y') }} a {{ \Carbon\Carbon::parse($end)->format('d/m/Y') }}</p>
+
+    <div class="section">
+        <h2>Treinamentos ministrados no mês</h2>
+        <div class="counter">{{ $trainings->count() }}</div>
+        <span class="small">Ministrados</span>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Treinamento</th>
+                    <th>Empresa</th>
+                    <th>Participantes</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($trainings as $item)
+                <tr>
+                    <td>{{ optional($item->schedule)->date_event ? \Carbon\Carbon::parse($item->schedule->date_event)->format('d/m/Y') : '-' }}</td>
+                    <td>{{ optional($item->schedule->training)->name ?? '-' }}</td>
+                    <td>{{ optional($item->company)->fantasy_name ?? '-' }}</td>
+                    <td>{{ $item->participants->count() }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Empresas atendidas no mês</h2>
+        <div class="counter">{{ $companies->count() }}</div>
+        <span class="small">No mês</span>
+        <table>
+            <thead>
+                <tr>
+                    <th>Empresa</th>
+                    <th>CNPJ</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($companies as $company)
+                <tr>
+                    <td>{{ $company->fantasy_name ?? '-' }}</td>
+                    <td>{{ $company->employer_number ?? '-' }}</td>
+                    <td>{{ $company->email ?? '-' }}</td>
+                    <td>{{ $company->phone ?? '-' }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Turmas extras no mês</h2>
+        <div class="counter">{{ $turmasExtras->count() }}</div>
+        <span class="small">No mês</span>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Treinamento</th>
+                    <th>Empresa Contratante</th>
+                    <th>Equipe</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($turmasExtras as $turma)
+                <tr>
+                    <td>{{ $turma->date_event ? \Carbon\Carbon::parse($turma->date_event)->format('d/m/Y') : '-' }}</td>
+                    <td>{{ optional($turma->training)->name ?? '-' }}</td>
+                    <td>{{ optional($turma->contractor)->fantasy_name ?? '-' }}</td>
+                    <td>{{ optional($turma->team)->name ?? '-' }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
+</body>
+</html> 

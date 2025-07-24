@@ -453,16 +453,10 @@ export function revenueChart2(myVarVal, hexToRgba) {
     setTimeout(() => {
         var options = {
             series: [{
-                    name: "TEAM A",
-                    type: "line",
-                    data: [30, 25, 36, 30, 45, 35, 64, 35, 55, 36, 39, 28, 15, 38],
-                },
-                {
-                    name: "TEAM B",
-                    type: "bar",
-                    data: [44, 55, 41, 67, 22, 43, 25, 41, 56, 27, 43, 30, 25, 45],
-                },
-            ],
+                name: "Treinamentos ministrados",
+                type: "bar",
+                data: [30, 25, 36, 30, 45, 35, 64, 35, 55, 36, 39, 28], // Exemplo: 12 meses
+            }],
             chart: {
                 height: 250,
                 stacked: false,
@@ -470,32 +464,30 @@ export function revenueChart2(myVarVal, hexToRgba) {
                     show: false,
                 }
             },
-
             stroke: {
-                width: [2, 1],
+                width: [2],
                 curve: "smooth",
-                // dashArray: [8, 0],
             },
             markers: {
-                size: [2, 0],
+                size: [2],
             },
             legend: {
                 show: true,
-				position: 'top',
-      			horizontalAlign: 'right',
-				fontSize: '10px',
-				fontWeight: 600, 
-				labels: {
-					colors: '#74767c',
-				},
-				markers: {
-					width: 7,
-					height: 7,
-					strokeWidth: 0,
-					radius: 12,
-					offsetX: 0,
-					offsetY: 0
-				},
+                position: 'top',
+                horizontalAlign: 'right',
+                fontSize: '12px',
+                fontWeight: 600, 
+                labels: {
+                    colors: '#74767c',
+                },
+                markers: {
+                    width: 7,
+                    height: 7,
+                    strokeWidth: 0,
+                    radius: 12,
+                    offsetX: 0,
+                    offsetY: 0
+                },
             },
             plotOptions: {
                 bar: {
@@ -503,11 +495,9 @@ export function revenueChart2(myVarVal, hexToRgba) {
                     borderRadius: 4,
                 },
             },
-
-            colors: ['#5eba00',myVarVal],
-
+            colors: [myVarVal],
             fill: {
-                opacity: [1, 1],
+                opacity: [1],
                 gradient: {
                     inverseColors: false,
                     shade: "light",
@@ -517,29 +507,17 @@ export function revenueChart2(myVarVal, hexToRgba) {
                     stops: [0, 100, 100, 100],
                 },
             },
-
             labels: [
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "July",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Sep",
-                "Oct",
-                "Nov",
-                "dec",
+                "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
             ],
-
             grid: {
                 show: true,
                 borderColor: "rgba(119, 119, 142, 0.1)",
             },
             xaxis: {
+                categories: [
+                    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+                ],
                 labels: {
                     show: true,
                     style: {
@@ -549,7 +527,6 @@ export function revenueChart2(myVarVal, hexToRgba) {
                 axisBorder: {
                     show: false,
                 },
-
                 lines: {
                     show: false,
                     color: "#fff",
@@ -574,21 +551,19 @@ export function revenueChart2(myVarVal, hexToRgba) {
                 },
                 min: 0,
             },
-
             tooltip: {
                 shared: true,
                 intersect: false,
                 y: {
                     formatter: function(y) {
                         if (typeof y !== "undefined") {
-                            return y.toFixed(0) + " points";
+                            return y + " treinamentos";
                         }
                         return y;
                     },
                 },
             },
         };
-
         document.querySelector("#revenue_chart").innerHTML = "";
         var revenue_chart = new ApexCharts(document.querySelector("#revenue_chart"), options);
         revenue_chart.render();

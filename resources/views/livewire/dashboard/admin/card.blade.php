@@ -1,12 +1,14 @@
 <div>
     <!-- ROW -->
     <div class="row">
-        <div class="col-xl-7 col-lg-12 col-md-12 col-sm-12">
-            @livewire('dashboard.admin.graph01.card')
-        </div>
-
-        <div class="col-xl-5 col-lg-12 col-md-12 col-sm-12">
+        <div class="col-12">
             @livewire('dashboard.admin.info.card')
+        </div>
+    </div>
+    <!-- END ROW -->
+    <div class="row">
+        <div class="col-12">
+            @livewire('dashboard.admin.graph01.card')
         </div>
     </div>
     <!-- END ROW -->

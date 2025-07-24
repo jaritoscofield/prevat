@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserVerifyController;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\DashboardExportController;
 
 //Route::view('/login', 'admin.auth.login')->middleware('guest')->name('login');
 //Route::view('/', 'admin.auth.login')->middleware('guest');
@@ -16,6 +17,7 @@ Route::middleware([
     'admin'
 ])->group(function () {
     Route::view('dashboard/', 'dashboard.index')->name('dashboard');
+    Route::get('dashboard/exportar-dados', [DashboardExportController::class, 'export'])->name('dashboard.exportar-dados');
     Route::view('agenda-semanal/', 'admin.schedule.index')->name('schedule');
 
     //Cadastros de Usuário

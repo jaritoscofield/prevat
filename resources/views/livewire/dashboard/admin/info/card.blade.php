@@ -1,67 +1,65 @@
 <div>
-    <div class="row row-sm">
-        <div class="col-sm-6 col-lg-6">
-            <div class="card overflow-hidden">
+    <div class="row mb-3">
+        <div class="col-12 text-end">
+            <a href="{{ route('dashboard.exportar-dados') }}" class="btn btn-primary" target="_blank">
+                <i class="fa fa-file-pdf-o"></i> Exportar dados
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Card: Treinamentos ministrados no mês -->
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card overflow-hidden border-0 shadow-sm" style="background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%); color: #fff;">
                 <div class="card-body">
-                    <div class="d-flex">
+                    <div class="d-flex align-items-center">
                         <div>
-                            <div class="mb-0 fw-semibold text-dark">Empresas Cadastradas</div>
-                            <h3 class="mt-1 mb-1 text-dark fw-semibold">4,304</h3>
-                            <div class="text-muted fs-12 mt-2"><i class="fe fe-arrow-up-right text-success me-1"></i>
-                                <span class="fw-bold fs-12 text-primary">6.05%</span> Since last month
-                            </div>
+                            <p class="mb-0 fw-semibold" style="color: #fff;">Treinamentos no mês</p>
+                            <h2 class="mt-1 mb-1 fw-bold" style="color: #fff;">{{$trainingsMonth}}</h2>
+                            <span class="fw-semibold fs-12" style="color: #e0e0e0;">Ministrados</span>
                         </div>
-                        <i class="fa fa-building ms-auto fs-5 my-auto bg-primary-transparent p-3 br-7 text-primary"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="card overflow-hidden">
-                <div class="card-body">
-                    <div class="d-flex">
-                        <div>
-                            <div class="mb-0 fw-semibold text-dark">Total de Agendamentos</div>
-                            <h3 class="mt-1 mb-1 text-dark fw-semibold">46.4K</h3>
-                            <div class="text-muted fs-12 mt-2"><i class="fe fe-arrow-up-right text-success me-1"></i>
-                                <span class="fw-bold fs-12 text-success">04.12%</span> Since last month
-                            </div>
-                        </div>
-                        <i class="fa fa-calendar ms-auto fs-5 my-auto bg-secondary-transparent p-3 br-7 text-secondary"></i>
+                        <span class="ms-auto my-auto avatar avatar-lg brround" style="background: rgba(255,255,255,0.15); color: #fff;">
+                            <i class="fa fa-chalkboard-teacher fs-2"></i>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-6">
-            <div class="card overflow-hidden">
+        <!-- Card: Empresas atendidas no mês -->
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card overflow-hidden border-0 shadow-sm" style="background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%); color: #fff;">
                 <div class="card-body">
-                    <div class="d-flex">
+                    <div class="d-flex align-items-center">
                         <div>
-                            <div class="mb-0 fw-semibold text-dark">Participantes Cadastrados</div>
-                            <h3 class="mt-1 mb-1 text-dark fw-semibold">25.04%</h3>
-                            <div class="text-muted fs-12 mt-2"><i class="fe fe-arrow-up-right text-warning me-1"></i>
-                                <span class="fw-bold fs-12 text-warning">0.20%</span> Since last month
-                            </div>
+                            <p class="mb-0 fw-semibold" style="color: #fff;">Empresas atendidas</p>
+                            <h2 class="mt-1 mb-1 fw-bold" style="color: #fff;">{{$companiesMonth}}</h2>
+                            <span class="fw-semibold fs-12" style="color: #e0e0e0;">No mês</span>
                         </div>
-                        <i class="fa fa-users ms-auto fs-5 my-auto bg-warning-transparent p-3 br-7 text-warning"></i>
+                        <span class="ms-auto my-auto avatar avatar-lg brround" style="background: rgba(255,255,255,0.15); color: #fff;">
+                            <i class="fa fa-building fs-2"></i>
+                        </span>
                     </div>
                 </div>
             </div>
-            <div class="card overflow-hidden">
+        </div>
+        <!-- Card: Turmas extras no mês -->
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card overflow-hidden border-0 shadow-sm" style="background: linear-gradient(90deg, #ff512f 0%, #dd2476 100%); color: #fff;">
                 <div class="card-body">
-                    <div class="d-flex">
+                    <div class="d-flex align-items-center">
                         <div>
-                            <div class="mb-0 fw-semibold text-dark">Cursos Cadastrados</div>
-                            <h3 class="mt-1 mb-1 text-dark fw-semibold">10K</h3>
-                            <div class="text-muted fs-12 mt-2"><i class="fe fe-arrow-up-right text-danger me-1"></i>
-                                <span class="fw-bold fs-12 text-danger">2.20%</span> Since last month
-                            </div>
+                            <p class="mb-0 fw-semibold" style="color: #fff;">Turmas extras</p>
+                            <h2 class="mt-1 mb-1 fw-bold" style="color: #fff;">{{$extraClassesMonth}}</h2>
+                            <span class="fw-semibold fs-12" style="color: #e0e0e0;">No mês</span>
                         </div>
-                        <i class="fa fa-school ms-auto fs-5 my-auto bg-danger-transparent p-3 br-7 text-danger"></i>
+                        <span class="ms-auto my-auto avatar avatar-lg brround" style="background: rgba(255,255,255,0.15); color: #fff;">
+                            <i class="fa fa-users-cog fs-2"></i>
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row row-sm">
+    <!-- <div class="row row-sm">
         <div class="col-12">
             <div class="card overflow-hidden">
                 <div class="card-header pb-0 border-bottom-0">
@@ -81,5 +79,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </div>
