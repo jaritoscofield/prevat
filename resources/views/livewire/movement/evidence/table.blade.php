@@ -41,6 +41,25 @@
                             </tr>
                             </thead>
                             <tbody>
+                            @php
+                                if (!function_exists('removerAcentos')) {
+                                    function removerAcentos($string) {
+                                        return strtr($string, [
+                                            'á'=>'a','à'=>'a','ã'=>'a','â'=>'a','ä'=>'a',
+                                            'é'=>'e','è'=>'e','ê'=>'e','ë'=>'e',
+                                            'í'=>'i','ì'=>'i','î'=>'i','ï'=>'i',
+                                            'ó'=>'o','ò'=>'o','õ'=>'o','ô'=>'o','ö'=>'o',
+                                            'ú'=>'u','ù'=>'u','û'=>'u','ü'=>'u',
+                                            'ç'=>'c','Á'=>'a','À'=>'a','Ã'=>'a','Â'=>'a','Ä'=>'a',
+                                            'É'=>'e','È'=>'e','Ê'=>'e','Ë'=>'e',
+                                            'Í'=>'i','Ì'=>'i','Î'=>'i','Ï'=>'i',
+                                            'Ó'=>'o','Ò'=>'o','Õ'=>'o','Ô'=>'o','Ö'=>'o',
+                                            'Ú'=>'u','Ù'=>'u','Û'=>'u','Ü'=>'u',
+                                            'Ç'=>'c'
+                                        ]);
+                                    }
+                                }
+                            @endphp
                             @foreach($response->evidences as $itemEvidence)
                                 <tr>
                                     <td class="fw-semibold text-dark fs-12"> {{ $itemEvidence['reference'] }}</td>
@@ -53,11 +72,9 @@
                                                     {{$itemEvidence['training_participation']['schedule_prevat']['training']['acronym']}} -
                                                     {{$itemEvidence['training_participation']['schedule_prevat']['training']['name']}}
                                                 </h6>
-{{--                                                <span class="text-muted fw-semibold fs-12">{{ $itemEvidence['workload']['name'] ?? '' }} - {{ $itemEvidence['room']['name'] ?? '' }}</span>--}}
                                             </div>
                                         </div>
                                     </td>
-
                                     <td>
                                         <div class="text-center">
                                             @if($itemEvidence['status'] == 'Ativo')
@@ -69,10 +86,27 @@
                                     </td>
                                     <td class="text-nowrap">
                                         @if($itemEvidence['file_path'])
-                                            <button wire:click="openDownloadModal({{$itemEvidence['id']}})" class="btn btn-sm btn-icon btn-success"  data-bs-toggle="tooltip" data-bs-placement="top"
-                                               title="Download">
-                                                <i class="fe fe-download"></i>
-                                            </button>
+                                            @php
+                                                $nomeCurso = removerAcentos(strtolower(trim($itemEvidence['training_participation']['schedule_prevat']['training']['name'] ?? '')));
+                                            @endphp
+                                            @if(
+                                                str_contains($nomeCurso, 'brigada') &&
+                                                str_contains($nomeCurso, 'incendio') &&
+                                                str_contains($nomeCurso, 'cfbi') &&
+                                                str_contains($nomeCurso, 'nivel basico')
+                                            )
+                                                <button wire:click="openDownloadModal({{$itemEvidence['id']}})" class="btn btn-sm btn-icon btn-success"  data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   title="Download">
+                                                    <i class="fe fe-download"></i>
+                                                </button>
+                                                <span style="font-size:10px;color:red;">{{ $nomeCurso }}</span>
+                                            @else
+                                                <button wire:click="downloadPDF({{$itemEvidence['id']}})" class="btn btn-sm btn-icon btn-success"  data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   title="Download">
+                                                    <i class="fe fe-download"></i>
+                                                </button>
+                                                <span style="font-size:10px;color:blue;">{{ $nomeCurso }}</span>
+                                            @endif
                                         @endif
 
                                         <a href="{{ route('movement.evidence.historic', $itemEvidence['id']) }}" class="btn btn-sm btn-icon btn-info" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -128,7 +162,17 @@
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Remover o modal de Dados do Certificado e o push de scripts relacionados -->
+
+<script type="text/javascript">
+    function modalDelete(data) {
+        $('#nomeUsuario').text(data.name);
+        $('#idUsuario').text(data.id);
+        $('#confirmDelete').text('confirmDeleteEvidence');
+        $('#Vertically').modal('show');
+    }
+</script>
 
 <!-- Modal para dados do certificado -->
 <div wire:ignore.self class="modal fade" id="modalDownloadCertificado" tabindex="-1" aria-labelledby="modalDownloadCertificadoLabel" aria-hidden="true">
@@ -151,6 +195,15 @@
                     <label for="licenca_protocolo" class="form-label">Nº do Protocolo</label>
                     <input type="text" wire:model.defer="licenca_protocolo" class="form-control" id="licenca_protocolo">
                 </div>
+                <div class="mb-3">
+                    <label for="qrcode_atestado" class="form-label">QR Code do Atestado (imagem)</label>
+                    <input type="file" wire:model="qrcode_atestado" class="form-control" id="qrcode_atestado" accept="image/*">
+                    @if($qrcode_atestado)
+                        <div class="mt-2">
+                            <img src="{{ $qrcode_atestado->temporaryUrl() }}" alt="Prévia QRCode" style="max-width: 120px; max-height: 120px;">
+                        </div>
+                    @endif
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -159,7 +212,6 @@
         </div>
     </div>
 </div>
-
 @push('scripts')
 <script>
     window.addEventListener('openDownloadModal', event => {
@@ -170,15 +222,6 @@
     });
 </script>
 @endpush
-
-<script type="text/javascript">
-    function modalDelete(data) {
-        $('#nomeUsuario').text(data.name);
-        $('#idUsuario').text(data.id);
-        $('#confirmDelete').text('confirmDeleteEvidence');
-        $('#Vertically').modal('show');
-    }
-</script>
 
 
 

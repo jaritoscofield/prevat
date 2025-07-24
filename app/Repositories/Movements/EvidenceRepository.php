@@ -497,7 +497,7 @@ class EvidenceRepository
         }
     }
 
-    public function generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo)
+    public function generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado = null)
     {
         try {
             $evidenceDB = Evidence::query()->withoutGlobalScopes()->find($evidence_id);
@@ -520,6 +520,18 @@ class EvidenceRepository
 
             $trainingParticipationDB = TrainingParticipations::query()->with(['schedule_prevat.training', 'professionals', 'participants.participant' => fn ($query) => $query->withoutGlobalScopes()])->find($evidenceDB['training_participation_id']);
 
+            $qrcode_atestado_path = null;
+            if ($qrcode_atestado) {
+                $dir = 'storage/evidences/'.$evidenceDB['id'].'/qrcodes';
+                $absDir = public_path($dir);
+                if (!is_dir($absDir)) {
+                    mkdir($absDir, 0775, true);
+                }
+                $filename = 'qrcode_atestado_' . uniqid() . '.' . $qrcode_atestado->getClientOriginalExtension();
+                $qrcode_atestado->storeAs($dir, $filename, ['disk' => 'public']);
+                $qrcode_atestado_path = $dir . '/' . $filename;
+            }
+
             $data = [
                 'certifications' => $trainingCertificatesDB,
                 'professionals' => $trainingParticipationDB,
@@ -529,6 +541,7 @@ class EvidenceRepository
                 'licenca_numero' => $licenca_numero,
                 'licenca_validade' => $licenca_validade,
                 'licenca_protocolo' => $licenca_protocolo,
+                'qrcode_atestado_path' => $qrcode_atestado_path,
             ];
 
             $pdf = \PDF::loadView('admin.pdf.evidence_certificates_03', $data)->setPaper('a4', 'landscape');

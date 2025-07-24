@@ -27,6 +27,7 @@ class Table extends Component
     public $licenca_validade;
     public $licenca_protocolo;
     public $evidence_id_for_download;
+    public $qrcode_atestado;
 
     #[On('filterTableEvidences')]
     public function filterTableEvidences($filterData = null)
@@ -79,7 +80,7 @@ class Table extends Component
         $this->licenca_numero = '';
         $this->licenca_validade = '';
         $this->licenca_protocolo = '';
-        $this->dispatchBrowserEvent('openDownloadModal');
+        $this->dispatch('openDownloadModal');
     }
 
     public function downloadPDFWithData()
@@ -88,14 +89,18 @@ class Table extends Component
         $licenca_numero = $this->licenca_numero;
         $licenca_validade = $this->licenca_validade;
         $licenca_protocolo = $this->licenca_protocolo;
-        $this->dispatchBrowserEvent('closeDownloadModal');
-        return app()->call([$this, 'downloadPDFCustom'], compact('evidence_id', 'licenca_numero', 'licenca_validade', 'licenca_protocolo'));
+        $qrcode_atestado = $this->qrcode_atestado;
+        $this->dispatch('closeDownloadModal');
+        return app()->call([
+            $this,
+            'downloadPDFCustom'
+        ], compact('evidence_id', 'licenca_numero', 'licenca_validade', 'licenca_protocolo', 'qrcode_atestado'));
     }
 
-    public function downloadPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo)
+    public function downloadPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado = null)
     {
-        $evidenceRepository = new EvidenceRepository();
-        $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo);
+        $evidenceRepository = new \App\Repositories\Movements\EvidenceRepository();
+        $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado);
         if ($result['status'] === 'success') {
             $filePath = public_path('storage/' . $result['data']['file_path']);
             return response()->download($filePath);
@@ -103,6 +108,17 @@ class Table extends Component
             session()->flash('error', $result['message'] ?? 'Erro ao gerar PDF');
             return null;
         }
+    }
+
+    public function downloadPDF($evidence_id)
+    {
+        $evidenceDB = \App\Models\Evidence::query()->withoutGlobalScopes()->findOrFail($evidence_id);
+        $fullPath = public_path('storage/' . $evidenceDB['file_path']);
+        if (!file_exists($fullPath)) {
+            session()->flash('error', 'Arquivo não encontrado.');
+            return null;
+        }
+        return response()->download($fullPath);
     }
 
     public function render()
