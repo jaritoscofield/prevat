@@ -83,38 +83,6 @@
         </div>
     </div>
 
-    {{-- CONTEÚDO PROGRAMÁTICO logo após o atestado --}}
-    <div class="web-container" style="margin-top: 40px;">
-        <div style="text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
-            CONTEÚDO PROGRAMÁTICO<br>
-            <span style="font-size: 16px; font-weight: normal;">Aulas teóricas (16h):</span>
-        </div>
-        <ol type="1" style="font-size: 15px; line-height:2; margin: 0 auto; max-width: 700px; padding-left: 30px;">
-            <li>Introdução (Objetivos do curso e dos Brigadistas);</li>
-            <li>O que é fogo;</li>
-            <li>Triângulo do fogo;</li>
-            <li>Teoria do fogo (Combustão, seus elementos e a reação em cadeia);</li>
-            <li>Propagação do fogo; Classes de incêndio;</li>
-            <li>Métodos de extinção;</li>
-            <li>Agentes extintores;</li>
-            <li>Extintores de incêndio;</li>
-            <li>Técnicas de combate a incêndio com extintores;</li>
-            <li>Procedimentos básicos em locais de Incêndio;</li>
-            <li>Sistemas fixos de combate a incêndio;</li>
-            <li>Sistemas de detecção, alarme e comunicações;</li>
-            <li>Ferramentas de salvamento;</li>
-            <li>Técnicas de combate a incêndio com uso de mangueiras e hidrantes;</li>
-            <li>Exigências legais quanto à instalação, localização e sinalização dos extintores de incêndio e hidrantes;</li>
-            <li>Pessoas com mobilidade reduzida;</li>
-            <li>Procedimentos básicos em locais de Incêndio;</li>
-            <li>Riscos específicos da planta e Prevenção de incêndio;</li>
-            <li>Plano de Emergência;</li>
-            <li>Procedimentos para abandono de área e controle de pânico.</li>
-            <li>Aulas teóricas (08h)</li>
-            <li>Práticas (08h)</li>
-        </ol>
-    </div>
-
     {{-- Gera um CERTIFICADO para cada participante --}}
     @foreach($certifications as $itemCertification)
         <div class="web-container">
