@@ -38,7 +38,7 @@
                 <th class="heading-qrcode">
                     <div class="qrcode-container">
                         @if(!empty($qrcode_atestado_path))
-                            <img src="{{ public_path($qrcode_atestado_path) }}" alt="qrcode_atestado" style="max-width:120px; max-height:120px;">
+                            <img src="{{ url($qrcode_atestado_path) }}" alt="qrcode_atestado" style="max-width:120px; max-height:120px;">
                         @else
                             @php
                                 $reference = $certifications[0]['reference'] ?? (new \App\Services\ReferenceService())->getReference();
