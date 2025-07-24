@@ -14,6 +14,94 @@
 <body>
 
 <div>
+    {{-- Gera o ATESTADO apenas uma vez --}}
+    <div class="web-container">
+        <table class="line-items-container">
+            <thead>
+            <tr>
+                <th class="heading-logo">
+                    <img  style="height: 60px" src="{{ url('pdf/images/prevat_logo_pdf.png')}}" alt="logo"><br>
+                    <div class="logo-info ">
+                        <span>CNPJ: 20.827.565/0001-54 </span><br>
+                        <span>End.: Rua Raimundo José Coutinho, Qd. 246. Lt.21, </span><br>
+                        <span>Bairro Núcleo Urbano, CEP: 68447-000 </span><br>
+                        <span> Vila dos Cabanos – Barcarena / PA. </span><br>
+                        <span>Fone: (91) 99231-4994 / 99367-6162 / 99663-1126 </span><br>
+                        <span>E-mail: atendimento2@prevat.com.br </span>
+                    </div>
+                </th>
+                <th class="heading-description">
+                    <div class="text-certificate center">
+                        ATESTADO
+                    </div>
+                </th>
+                <th class="heading-qrcode">
+                    <div class="qrcode-container">
+                        @if(!empty($qrcode_atestado_path))
+                            <img src="{{ public_path($qrcode_atestado_path) }}" alt="qrcode_atestado" style="max-width:120px; max-height:120px;">
+                        @else
+                            @php
+                                $reference = $certifications[0]['reference'] ?? (new \App\Services\ReferenceService())->getReference();
+                                $path = 'images/qrcodes/'.$reference.'.png';
+                                if(!file_exists(public_path($path))) {
+                                    if(!is_dir(public_path('images/qrcodes'))) {
+                                        mkdir(public_path('images/qrcodes'), 0755, true);
+                                    }
+                                    $qrCodePath = public_path($path);
+                                    \LaravelQRCode\Facades\QRCode::url(url('consulta-certificado/'.$reference))
+                                        ->setOutfile($qrCodePath)
+                                        ->setSize(4)
+                                        ->setMargin(2)
+                                        ->png();
+                                }
+                            @endphp
+                            <img src="{{ url($path) }}" alt="qrcode">
+                        @endif
+                    </div>
+                </th>
+            </tr>
+            </thead>
+        </table>
+        <div class="line"></div>
+        <div class="title">
+            <div class="center"></div>
+            <div class="center"></div>
+        </div>
+        <div class="content">
+            <br><br>
+            <p class="">Atestamos que a <span class="bold"> {{$certifications[0]['company']['name']}}  - CNPJ –
+                {{$certifications[0]['company']['employer_number']}} </span> Promoveu o CURSO DE {{$certifications[0]['training']['name']}}, aos seus
+                colaboradores, para o quantitativo de {{$certifications[0]['training_participation']['participants']->count()}} brigadistas formados, com carga horária de {{$certifications[0]['training_participation']['schedule_prevat']['workload']['name']}}/aula, com aproveitamento de 100% nos dias
+                {{ formatDate($certifications[0]['training_participation']['schedule_prevat']['start_event']) }} a {{formatDate($certifications[0]['training_participation']['schedule_prevat']['end_event'])}},
+                realizado nas dependências da própria empresa.
+            </p>
+        </div>
+        <div class="date" style="padding-top: 80px;">
+            <p class="right">Barcarena-PA, {{ formatCertificate($certifications[0]['training_participation']['schedule_prevat']['end_event'])}}</p>
+        </div>
+        <div class="footer-certificate">
+            <table class="line-signatures-container center">
+                <tr class="">
+                    <td width="33%">
+                        @foreach($professionals['professionals'] as $itemProfessional)
+                            @if($itemProfessional['professional']['signature_image'] && $itemProfessional['front'])
+                                <img style="height: 180px" src="{{ url('images/signatures/' . $itemProfessional['professional']['signature_image']) }}" alt="assinatura">
+                            @endif
+                        @endforeach
+                    </td>
+                    <td width="33%">
+                        <img style="height:180px;" src="{{ url('images/signatures/assinatura_diretor.png') }}" alt="assinatura_tecnico">
+                    </td>
+                    <td width="33%">
+                        <img  style="height: 180px; " src="{{ url('images/signatures/assinatura_participante.png')}}" alt="assinatura_participante">
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="page-break"></div>
+
+    {{-- Gera um CERTIFICADO para cada participante --}}
     @foreach($certifications as $itemCertification)
         <div class="web-container">
             <table class="line-items-container">
@@ -30,207 +118,6 @@
                             <span>E-mail: atendimento2@prevat.com.br </span>
                         </div>
                     </th>
-
-                    <th class="heading-description">
-                        <div class="text-certificate center">
-                            ATESTADO
-                        </div>
-                    </th>
-                    <th class="heading-qrcode">
-                        <div class="qrcode-container">
-                            @if(!empty($qrcode_atestado_path))
-                                <img src="{{ public_path($qrcode_atestado_path) }}" alt="qrcode_atestado" style="max-width:120px; max-height:120px;">
-                            @else
-                                @php
-                                    $reference = $itemCertification['reference'] ?? (new \App\Services\ReferenceService())->getReference();
-                                    $path = 'images/qrcodes/'.$reference.'.png';
-                                    if(!file_exists(public_path($path))) {
-                                        if(!is_dir(public_path('images/qrcodes'))) {
-                                            mkdir(public_path('images/qrcodes'), 0755, true);
-                                        }
-                                        $qrCodePath = public_path($path);
-                                        \LaravelQRCode\Facades\QRCode::url(url('consulta-certificado/'.$reference))
-                                            ->setOutfile($qrCodePath)
-                                            ->setSize(4)
-                                            ->setMargin(2)
-                                            ->png();
-                                        $itemCertification->path_qrcode = $path;
-                                        $itemCertification->save();
-                                    }
-                                @endphp
-                                <img src="{{ url($path) }}" alt="qrcode">
-                            @endif
-                        </div>
-                    </th>
-                </tr>
-                </thead>
-            </table>
-            <div class="line"></div>
-
-            <div class="title">
-                <div class="center">
-
-                </div>
-                <div class="center">
-                </div>
-
-            </div>
-
-            <div class="content">
-                <br><br>
-
-                <p class="">Atestamos que a <span class="bold"> {{$itemCertification['company']['name']}}  - CNPJ –
-                {{$itemCertification['company']['employer_number']}} </span> Promoveu o CURSO DE {{$itemCertification['training']['name']}}, aos seus
-                    colaboradores, para o quantitativo de {{$itemCertification['training_participation']['participants']->count()}} brigadistas formados, com carga horária de {{$itemCertification['training_participation']['schedule_prevat']['workload']['name']}}/aula, com aproveitamento de 100% nos dias
-                    {{ formatDate($itemCertification['training_participation']['schedule_prevat']['start_event']) }} a {{formatDate($itemCertification['training_participation']['schedule_prevat']['end_event'])}},
-                    realizado nas dependências da própria empresa.
-                </p>
-
-            </div>
-            <div class="date" style="padding-top: 80px;">
-                <p class="right">Barcarena-PA, {{ formatCertificate($itemCertification['training_participation']['schedule_prevat']['end_event'])}}</p>
-            </div>
-
-            <div class="footer-certificate">
-                <table class="line-signatures-container center">
-                    <tr class="">
-                        <td width="33%">
-                            @foreach($professionals['professionals'] as $itemProfessional)
-                                @if($itemProfessional['professional']['signature_image'] && $itemProfessional['front'])
-                                    <img style="height: 180px" src="{{ url('images/signatures/' . $itemProfessional['professional']['signature_image']) }}" alt="assinatura">
-                                @endif
-                            @endforeach
-                        </td>
-                        <td width="33%">
-                            <img style="height:180px;" src="{{ url('images/signatures/assinatura_diretor.png') }}" alt="assinatura_tecnico">
-                        </td>
-                        <td width="33%">
-                            <img  style="height: 180px; " src="{{ url('images/signatures/assinatura_participante.png')}}" alt="assinatura_participante">
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <div class="page-break"></div>
-        <div class="web-container">
-
-            <div class="content-programatic_03">
-                <table style="font-size: 12px; line-height:1.5em; border-spacing: 15px; font-family: Arial; ">
-                    <tr>
-                        <th width="60%" style="text-align: left; vertical-align:top; padding-right: 30px; ">
-                            <div class="content-programatic-title-02 center">
-                                <p class="">PARTICIPANTES</p>
-                            </div>
-                            <table style="border: 1px solid;  border-collapse: collapse;">
-                                <tr>
-                                    <th width="70%" style="text-align: left; vertical-align:top; padding-right: 10px; border: 1px solid;  border-collapse: collapse;">
-                                        NOME
-                                    </th>
-
-                                    <th width="30%" style="text-align: center; vertical-align:top; border: 1px solid;  border-collapse: collapse; ">
-                                        CPF
-                                    </th>
-                                </tr>
-
-                                @foreach($participants as $itemParticipant)
-                                    <tr>
-                                        {{--                                @dd($itemParticipant)--}}
-                                        <th width="70%" style="text-align: left; vertical-align:top; padding-right: 10px; border: 1px solid;  border-collapse: collapse;">
-                                            {{$itemParticipant['participant']['name']}}
-                                        </th>
-
-                                        <th width="30%" style="text-align: center; vertical-align:top; border: 1px solid;  border-collapse: collapse; ">
-                                            {{$itemParticipant['participant']['taxpayer_registration']}}
-                                        </th>
-                                    </tr>
-                                @endforeach
-
-                            </table>
-
-                        </th>
-                        <th width="40%" style="text-align: left; vertical-align:top;  ">
-                            <div class="content-programatic-title-02 center">
-                                <p class="bold">CONTEÚDO PROGRAMÁTICO <br> Aulas teóricas (16h):</p>
-                            </div>
-                            <ol type="1" style="font-size: 10px;">
-                                <li> Introdução (Objetivos do curso e dos Brigadistas)</li>
-                                <li> O que é fogo</li>
-                                <li> Triangulo dofogo</li>
-                                <li> Teoria do fogo (Combustão, seus elementos e a reação em
-                                    cadeia)</li>
-                                <li> Propagação do fogo; Classes deincêndio</li>
-                                <li> Métodos de extinção</li>
-                                <li> Agentes extintores</li>
-                                <li> Extintores de incêndio</li>
-                                <li> Técnicas de combate a incêndio comextintores</li>
-                                <li> Procedimentos básicos em locais de Incêndio</li>
-                                <li> Sistemas fixos de combate a incêndio</li>
-                                <li> Sistemas de detecção, alarme ecomunicações</li>
-                                <li> Ferramentas de salvamento</li>
-                                <li> Técnicas de combate a incêndio com uso de mangueiras e
-                                    hidrantes</li>
-                                <li> Exigências legais quanto à instalação,
-                                    localização e sinalização dos extintores de incêndio e hidrantes</li>
-                                <li> Pessoas com mobilidade reduzida</li>
-                                <li> Procedimentos básicos em locais de Incêndio</li>
-                                <li> Riscos específicos da planta e Prevenção de incêndio</li>
-                                <li> Plano de Emergência</li>
-                                <li> Procedimentos para abandono de área e controle de pânico</li>
-                                <li> Aulas teóricas (08h)</li>
-                                <li> Práticas (08h)</li>
-
-                            </ol>
-                        </th>
-                </table>
-
-            </div>
-
-            <div class="signatures">
-                <table class="line-signatures-container center" style="padding-top: 10px;">
-                    <tr class="">
-                        <td class="">
-
-                        </td>
-
-                        <td class="">
-                            @foreach($professionals['professionals'] as $itemProfessional)
-                                @if($itemProfessional['verse'] && $itemProfessional['professional']['signature_image'])
-                                    <img  style="height: 100px; padding-bottom:25px; padding-left: 20px; padding-right: 30px;" src="{{ url('images/signatures/' . $itemProfessional['professional']['signature_image']) }}" alt="assinatura">
-                                @endif
-                            @endforeach
-                        </td>
-
-                        <td class="">
-
-                        </td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="footer-programatic">
-                <span class="">PREVAT - Treinamento</span>
-                <div class="">
-                    Amparo Legal: Art. 1 do Decreto 5154/04, a Educação Profissional prevista no Art. 39 da Lei 9394/96 Lei de Diretrizes e Bases da Educação
-                </div>
-            </div>
-        </div>
-        <div class="page-break"></div>
-        <div class="web-container">
-            <table class="line-items-container">
-                <thead>
-                <tr>
-                    <th class="heading-logo">
-                        <img  style="height: 60px" src="{{ url('pdf/images/prevat_logo_pdf.png')}}" alt="logo"><br>
-                        <div class="logo-info ">
-                            <span>CNPJ: 20.827.565/0001-54 </span><br>
-                            <span>End.: Rua Raimundo José Coutinho, Qd. 246. Lt.21, </span><br>
-                            <span>Bairro Núcleo Urbano, CEP: 68447-000 </span><br>
-                            <span> Vila dos Cabanos – Barcarena / PA. </span><br>
-                            <span>Fone: (91) 99231-4994 / 99367-6162 / 99663-1126 </span><br>
-                            <span>E-mail: atendimento2@prevat.com.br </span>
-                        </div>
-                    </th>
-
                     <th class="heading-description">
                         <div class="text-certificate center">
                             CERTIFICADO
@@ -241,7 +128,6 @@
                             @php
                                 $reference = $itemCertification['reference'] ?? (new \App\Services\ReferenceService())->getReference();
                                 $path = 'images/qrcodes/'.$reference.'.png';
-                                
                                 if(!file_exists(public_path($path))) {
                                     if(!is_dir(public_path('images/qrcodes'))) {
                                         mkdir(public_path('images/qrcodes'), 0755, true);
@@ -252,7 +138,6 @@
                                         ->setSize(4)
                                         ->setMargin(2)
                                         ->png();
-                                    
                                     $itemCertification->path_qrcode = $path;
                                     $itemCertification->save();
                                 }
@@ -264,17 +149,10 @@
                 </thead>
             </table>
             <div class="line"></div>
-
             <div class="title">
-                <div class="center">
-
-                </div>
-
-                <div class="center">
-
-                </div>
+                <div class="center"></div>
+                <div class="center"></div>
             </div>
-
             <div class="content">
                 <br><br>
                 <p>Conferimos o presente certificado à <span class="bold">{{$itemCertification['participant']['name']}}</span>, inscrito no C.P.F. sob o n° {{$itemCertification['participant']['taxpayer_registration']}} por sua
@@ -284,11 +162,9 @@
                 </p>
                 <br>
             </div>
-
             <div class="date" style="padding-top: 80px;">
                 <p class="right">Barcarena-PA, {{ formatCertificate($itemCertification['training_participation']['schedule_prevat']['end_event'])}}</p>
             </div>
-
             <div class="footer-certificate">
                 <table class="line-signatures-container center">
                     <tr class="">
@@ -310,6 +186,7 @@
             </div>
         </div>
         <div class="page-break"></div>
+        {{-- O restante do conteúdo do certificado (objetivo, conteúdo programático, etc.) pode ser mantido aqui, se for individual por participante. --}}
         <div class="web-container">
             <div class="content03">
                 <p> <span class="bold">OBJETIVO:</span> Proporcionar aos participantes, formação e conhecimentos técnicos na área de combate a incêndio e outras emergências tecnológicas,
@@ -541,8 +418,8 @@
         @if(!$loop->last)
             <div class="page-break"></div>
         @endif
+    @endforeach
 </div>
-@endforeach
 
 </body>
 </html>
