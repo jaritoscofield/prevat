@@ -403,6 +403,65 @@
         @endif
     @endforeach
 </div>
+<div class="page-break"></div>
+<div class="web-container">
+    <table style="width:100%; border-spacing: 15px; font-family: Arial;">
+        <tr>
+            <td width="60%" style="vertical-align:top; padding-right: 30px;">
+                <div class="content-programatic-title-02 center">
+                    <p class="">PARTICIPANTES</p>
+                </div>
+                <table style="border: 1px solid; border-collapse: collapse; width:100%;">
+                    <tr>
+                        <th style="text-align: left; border: 1px solid;">NOME</th>
+                        <th style="text-align: center; border: 1px solid;">CPF</th>
+                    </tr>
+                    @foreach($participants as $itemParticipant)
+                        <tr>
+                            <td style="text-align: left; border: 1px solid;">{{$itemParticipant['participant']['name']}}</td>
+                            <td style="text-align: center; border: 1px solid;">{{$itemParticipant['participant']['taxpayer_registration']}}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </td>
+            <td width="40%" style="vertical-align:top;">
+                <div class="content-programatic-title-02 center">
+                    <p class="bold">CONTEÚDO PROGRAMÁTICO<br>Aulas teóricas (16h):</p>
+                </div>
+                <ol type="1" style="font-size: 12px; line-height:1.5em;">
+                    <li>Introdução (Objetivos do curso e dos Brigadistas);</li>
+                    <li>O que é fogo;</li>
+                    <li>Triângulo do fogo;</li>
+                    <li>Teoria do fogo (Combustão, seus elementos e a reação em cadeia);</li>
+                    <li>Propagação do fogo; Classes de incêndio;</li>
+                    <li>Métodos de extinção;</li>
+                    <li>Agentes extintores;</li>
+                    <li>Extintores de incêndio;</li>
+                    <li>Técnicas de combate a incêndio com extintores;</li>
+                    <li>Procedimentos básicos em locais de Incêndio;</li>
+                    <li>Sistemas fixos de combate a incêndio;</li>
+                    <li>Sistemas de detecção, alarme e comunicações;</li>
+                    <li>Ferramentas de salvamento;</li>
+                    <li>Técnicas de combate a incêndio com uso de mangueiras e hidrantes;</li>
+                    <li>Exigências legais quanto à instalação, localização e sinalização dos extintores de incêndio e hidrantes;</li>
+                    <li>Pessoas com mobilidade reduzida;</li>
+                    <li>Procedimentos básicos em locais de Incêndio;</li>
+                    <li>Riscos específicos da planta e Prevenção de incêndio;</li>
+                    <li>Plano de Emergência;</li>
+                    <li>Procedimentos para abandono de área e controle de pânico.</li>
+                    <li>Aulas teóricas (08h)</li>
+                    <li>Práticas (08h)</li>
+                </ol>
+                <div style="margin-top: 40px; text-align: right;">
+                    <span style="color: red; font-weight: bold; font-size: 18px; display: block;">Certificado de Licenciamento</span>
+                    <span style="color: red; font-weight: bold; font-size: 16px; display: block;">Nº {{ $licenca_numero ?? '' }}</span>
+                    <span style="color: red; font-weight: bold; font-size: 16px; display: block;">Validade: {{ !empty($licenca_validade) ? \Carbon\Carbon::parse($licenca_validade)->format('d/m/Y') : '' }}</span>
+                    <span style="color: red; font-weight: bold; font-size: 16px; display: block;">Nº do Protocolo: {{ $licenca_protocolo ?? '' }}</span>
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
 
 </body>
 </html>
