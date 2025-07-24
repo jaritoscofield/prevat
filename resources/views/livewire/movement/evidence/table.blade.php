@@ -99,7 +99,6 @@
                                                    title="Download">
                                                     <i class="fe fe-download"></i>
                                                 </button>
-                                                <span style="font-size:10px;color:red;">{{ $nomeCurso }}</span>
                                             @else
                                                 <button wire:click="downloadPDF({{$itemEvidence['id']}})" class="btn btn-sm btn-icon btn-success"  data-bs-toggle="tooltip" data-bs-placement="top"
                                                    title="Download">
