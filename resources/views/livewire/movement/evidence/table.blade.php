@@ -201,11 +201,16 @@
                             <img src="{{ $qrcode_atestado->temporaryUrl() }}" alt="Prévia QRCode" style="max-width: 120px; max-height: 120px;">
                         </div>
                     @endif
+                    <div wire:loading wire:target="qrcode_atestado">
+                        <span class="text-info">Carregando imagem...</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" wire:click="downloadPDFWithData">Download</button>
+                <button type="button" wire:click="downloadPDFWithData" wire:loading.attr="disabled" wire:target="downloadPDFWithData, qrcode_atestado" class="btn btn-primary">
+                    Gerar PDF
+                </button>
             </div>
         </div>
     </div>
