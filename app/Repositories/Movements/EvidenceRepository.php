@@ -530,21 +530,24 @@ class EvidenceRepository
 
             $qrcode_atestado_path = null;
             if ($qrcode_atestado) {
-                \Log::info('qrcode_atestado recebido', [
-                    'originalName' => method_exists($qrcode_atestado, 'getClientOriginalName') ? $qrcode_atestado->getClientOriginalName() : null,
-                    'extension' => method_exists($qrcode_atestado, 'getClientOriginalExtension') ? $qrcode_atestado->getClientOriginalExtension() : null,
-                ]);
-                $dir = 'storage/evidences/'.$evidenceDB['id'].'/qrcodes';
-                $absDir = public_path($dir);
-                if (!is_dir($absDir)) {
-                    mkdir($absDir, 0775, true);
+                if (is_string($qrcode_atestado)) {
+                    // Novo fluxo: já é o caminho salvo
+                    $qrcode_atestado_path = $qrcode_atestado;
+                    \Log::info('Usando qrcode_atestado_path já salvo', ['qrcode_atestado_path' => $qrcode_atestado_path]);
+                } elseif (is_object($qrcode_atestado) && method_exists($qrcode_atestado, 'getClientOriginalExtension')) {
+                    // Fluxo antigo: upload direto do arquivo
+                    $dir = 'storage/evidences/'.$evidenceDB['id'].'/qrcodes';
+                    $absDir = public_path($dir);
+                    if (!is_dir($absDir)) {
+                        mkdir($absDir, 0775, true);
+                    }
+                    $filename = 'qrcode_atestado_' . uniqid() . '.' . $qrcode_atestado->getClientOriginalExtension();
+                    \Log::info('Salvando qrcode_atestado', ['dir' => $dir, 'filename' => $filename]);
+                    $storeResult = $qrcode_atestado->storeAs($dir, $filename, ['disk' => 'public']);
+                    \Log::info('Resultado do storeAs', ['storeResult' => $storeResult]);
+                    $qrcode_atestado_path = $dir . '/' . $filename;
+                    \Log::info('qrcode_atestado_path final', ['qrcode_atestado_path' => $qrcode_atestado_path, 'file_exists' => file_exists(public_path($qrcode_atestado_path))]);
                 }
-                $filename = 'qrcode_atestado_' . uniqid() . '.' . $qrcode_atestado->getClientOriginalExtension();
-                \Log::info('Salvando qrcode_atestado', ['dir' => $dir, 'filename' => $filename]);
-                $storeResult = $qrcode_atestado->storeAs($dir, $filename, ['disk' => 'public']);
-                \Log::info('Resultado do storeAs', ['storeResult' => $storeResult]);
-                $qrcode_atestado_path = $dir . '/' . $filename;
-                \Log::info('qrcode_atestado_path final', ['qrcode_atestado_path' => $qrcode_atestado_path, 'file_exists' => file_exists(public_path($qrcode_atestado_path))]);
             }
 
             $data = [
