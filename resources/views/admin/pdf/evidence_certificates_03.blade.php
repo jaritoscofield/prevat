@@ -13,22 +13,32 @@
 </head>
 <body>
 <style>
-    .brigada-bg {
-        position: absolute;
+    .marca-dagua-container {
+        position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        opacity: 0.08;
+        width: 100vw;
+        height: 100vh;
         z-index: 0;
         pointer-events: none;
     }
-    .web-container {
-        position: relative;
+    .marca-dagua {
+        width: 80vw;
+        height: auto;
+        opacity: 0.08;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .web-container, .web-container * {
+        background: transparent !important;
         z-index: 1;
     }
 </style>
+<div class="marca-dagua-container">
+    <img src="{{ public_path('images/logo_brigada.png') }}" class="marca-dagua" alt="Marca d'água Brigada" />
+</div>
 
 <div>
     @foreach($certifications as $itemCertification)
