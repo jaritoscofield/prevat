@@ -510,10 +510,10 @@
                                 <tr>
                                     <th style="text-align: center; vertical-align:top; font-size:14px; padding: 20px; border: 1px solid;  border-collapse: collapse;">
                                 <span style="color:red;">
-                                    Certificado de Licenciamento
-                                Nº 390829
-                                Validade: 09/05/2025
-                                Nº do Protocolo: 677754
+                                    Certificado de Licenciamento<br>
+                                    Nº {{ $licenca_numero ?? '' }}<br>
+                                    Validade: {{ $licenca_validade ?? '' }}<br>
+                                    Nº do Protocolo: {{ $licenca_protocolo ?? '' }}
                                 </span>
                                     </th>
                                 </tr>

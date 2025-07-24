@@ -69,7 +69,7 @@
                                     </td>
                                     <td class="text-nowrap">
                                         @if($itemEvidence['file_path'])
-                                            <button wire:click="downloadPDF({{$itemEvidence['id']}})" class="btn btn-sm btn-icon btn-success"  data-bs-toggle="tooltip" data-bs-placement="top"
+                                            <button wire:click="openDownloadModal({{$itemEvidence['id']}})" class="btn btn-sm btn-icon btn-success"  data-bs-toggle="tooltip" data-bs-placement="top"
                                                title="Download">
                                                 <i class="fe fe-download"></i>
                                             </button>
@@ -129,6 +129,47 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para dados do certificado -->
+<div wire:ignore.self class="modal fade" id="modalDownloadCertificado" tabindex="-1" aria-labelledby="modalDownloadCertificadoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDownloadCertificadoLabel">Dados do Certificado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="licenca_numero" class="form-label">Certificado de Licenciamento Nº</label>
+                    <input type="text" wire:model.defer="licenca_numero" class="form-control" id="licenca_numero">
+                </div>
+                <div class="mb-3">
+                    <label for="licenca_validade" class="form-label">Validade</label>
+                    <input type="date" wire:model.defer="licenca_validade" class="form-control" id="licenca_validade">
+                </div>
+                <div class="mb-3">
+                    <label for="licenca_protocolo" class="form-label">Nº do Protocolo</label>
+                    <input type="text" wire:model.defer="licenca_protocolo" class="form-control" id="licenca_protocolo">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" wire:click="downloadPDFWithData">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+    window.addEventListener('openDownloadModal', event => {
+        $('#modalDownloadCertificado').modal('show');
+    });
+    window.addEventListener('closeDownloadModal', event => {
+        $('#modalDownloadCertificado').modal('hide');
+    });
+</script>
+@endpush
 
 <script type="text/javascript">
     function modalDelete(data) {

@@ -497,4 +497,94 @@ class EvidenceRepository
         }
     }
 
+    public function generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo)
+    {
+        try {
+            $evidenceDB = Evidence::query()->withoutGlobalScopes()->find($evidence_id);
+
+            $trainingCertificatesDB = TrainingCertificates::query()->with([
+                'training_participation.schedule_prevat.workload',
+                'training_participation.schedule_prevat.location',
+                'training_participation.schedule_prevat.room',
+                'training_participation.schedule_prevat.first_time',
+                'training_participation.schedule_prevat.second_time',
+                'company',
+                'training',
+                'participant' => fn($query) => $query->withoutGlobalScopes()])
+                ->where('training_participation_id', $evidenceDB['training_participation_id'])
+                ->where('company_id', $evidenceDB['company_id'])
+                ->whereHas('participant', function($query) use ($evidenceDB){
+                    $query->withoutGlobalScopes()->where('contract_id', $evidenceDB['contract_id']);
+                })
+                ->get();
+
+            $trainingParticipationDB = TrainingParticipations::query()->with(['schedule_prevat.training', 'professionals', 'participants.participant' => fn ($query) => $query->withoutGlobalScopes()])->find($evidenceDB['training_participation_id']);
+
+            $data = [
+                'certifications' => $trainingCertificatesDB,
+                'professionals' => $trainingParticipationDB,
+                'professionalsProgramatic' => $trainingParticipationDB['professionals'],
+                'content' => $trainingParticipationDB['schedule_prevat'],
+                'participants' => $trainingParticipationDB['participants'],
+                'licenca_numero' => $licenca_numero,
+                'licenca_validade' => $licenca_validade,
+                'licenca_protocolo' => $licenca_protocolo,
+            ];
+
+            $pdf = \PDF::loadView('admin.pdf.evidence_certificates_03', $data)->setPaper('a4', 'landscape');
+
+            $fileName = preg_replace('/[^a-zA-Z0-9_]/', '_', $trainingParticipationDB['schedule_prevat']['training']['name']);
+            $fileName = 'certificados_' . $fileName . '.pdf';
+
+            $baseDir = public_path('storage/evidences');
+            if (!is_dir($baseDir)) {
+                if (!mkdir($baseDir, 0775, true)) {
+                    \Log::error('Falha ao criar diretório base: ' . $baseDir);
+                    throw new \Exception('Falha ao criar diretório base');
+                }
+                chmod($baseDir, 0775);
+            }
+
+            $evidenceDir = $baseDir . '/' . $evidenceDB['id'];
+            if (!is_dir($evidenceDir)) {
+                if (!mkdir($evidenceDir, 0775, true)) {
+                    \Log::error('Falha ao criar diretório da evidência: ' . $evidenceDir);
+                    throw new \Exception('Falha ao criar diretório da evidência');
+                }
+                chmod($evidenceDir, 0775);
+            }
+
+            $filePath = 'evidences/' . $evidenceDB['id'] . '/' . $fileName;
+            $fullPath = public_path('storage/' . $filePath);
+
+            $pdf->save($fullPath);
+            chmod($fullPath, 0664);
+
+            if (!file_exists($fullPath)) {
+                \Log::error('Falha ao salvar o arquivo PDF: ' . $fullPath);
+                throw new \Exception('Falha ao salvar o arquivo PDF');
+            }
+
+            $evidenceDB->update([
+                'file_path' => $filePath
+            ]);
+
+            return [
+                'status' => 'success',
+                'data' => $evidenceDB,
+                'code' => 200,
+                'message' => 'PDF gerado com sucesso!'
+            ];
+
+        } catch (\Exception $exception) {
+            \Log::error('Erro ao gerar PDF: ' . $exception->getMessage());
+            \Log::error('Stack trace: ' . $exception->getTraceAsString());
+            return [
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Erro ao gerar PDF: ' . $exception->getMessage()
+            ];
+        }
+    }
+
 }
