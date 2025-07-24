@@ -21,7 +21,7 @@
             <tr>
                 <th class="heading-logo">
                     <img  style="height: 60px" src="{{ url('pdf/images/prevat_logo_pdf.png')}}" alt="logo"><br>
-                    <div class="logo-info ">
+                    <div class="logo-info ">ajuste
                         <span>CNPJ: 20.827.565/0001-54 </span><br>
                         <span>End.: Rua Raimundo José Coutinho, Qd. 246. Lt.21, </span><br>
                         <span>Bairro Núcleo Urbano, CEP: 68447-000 </span><br>
