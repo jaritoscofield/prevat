@@ -15,13 +15,14 @@
 <style>
     .brigada-bg {
         position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 600px;
-        height: 600px;
-        transform: translate(-50%, -50%);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
         opacity: 0.08;
         z-index: 0;
+        pointer-events: none;
     }
     .web-container {
         position: relative;
