@@ -39,23 +39,6 @@
                     <div class="qrcode-container">
                         @if(!empty($qrcode_atestado_path))
                             <img src="{{ asset($qrcode_atestado_path) }}" alt="qrcode_atestado" style="max-width:120px; max-height:120px;">
-                        @else
-                            @php
-                                $reference = $certifications[0]['reference'] ?? (new \App\Services\ReferenceService())->getReference();
-                                $path = 'images/qrcodes/'.$reference.'.png';
-                                if(!file_exists(public_path($path))) {
-                                    if(!is_dir(public_path('images/qrcodes'))) {
-                                        mkdir(public_path('images/qrcodes'), 0755, true);
-                                    }
-                                    $qrCodePath = public_path($path);
-                                    \LaravelQRCode\Facades\QRCode::url(url('consulta-certificado/'.$reference))
-                                        ->setOutfile($qrCodePath)
-                                        ->setSize(4)
-                                        ->setMargin(2)
-                                        ->png();
-                                }
-                            @endphp
-                            <img src="{{ url($path) }}" alt="qrcode">
                         @endif
                     </div>
                 </th>

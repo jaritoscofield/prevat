@@ -28,8 +28,6 @@ class Table extends Component
     public $licenca_validade;
     public $licenca_protocolo;
     public $evidence_id_for_download;
-    public $qrcode_atestado;
-    public $qrcode_atestado_path = null;
 
     #[On('filterTableEvidences')]
     public function filterTableEvidences($filterData = null)
@@ -91,34 +89,21 @@ class Table extends Component
         $licenca_numero = $this->licenca_numero;
         $licenca_validade = $this->licenca_validade;
         $licenca_protocolo = $this->licenca_protocolo;
-        $qrcode_atestado = $this->qrcode_atestado;
         $this->dispatch('closeDownloadModal');
         return app()->call([
             $this,
             'downloadPDFCustom'
-        ], compact('evidence_id', 'licenca_numero', 'licenca_validade', 'licenca_protocolo', 'qrcode_atestado'));
-    }
-
-    public function updatedQrcodeAtestado()
-    {
-        if ($this->qrcode_atestado) {
-            $evidence_id = $this->evidence_id_for_download ?? 'temp';
-            $dir = 'storage/evidences/'.$evidence_id.'/qrcodes';
-            $filename = 'qrcode_atestado_' . uniqid() . '.' . $this->qrcode_atestado->getClientOriginalExtension();
-            $this->qrcode_atestado->storeAs($dir, $filename, ['disk' => 'public']);
-            $this->qrcode_atestado_path = $dir . '/' . $filename;
-            \Log::info('Upload instantâneo do QRCode', ['path' => $this->qrcode_atestado_path]);
-        }
+        ], compact('evidence_id', 'licenca_numero', 'licenca_validade', 'licenca_protocolo'));
     }
 
     public function downloadPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo)
     {
         \Log::info('Livewire: downloadPDFCustom chamado', [
             'evidence_id' => $evidence_id,
-            'qrcode_atestado_path' => $this->qrcode_atestado_path,
+            'licenca_numero' => $licenca_numero,
         ]);
         $evidenceRepository = new \App\Repositories\Movements\EvidenceRepository();
-        $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $this->qrcode_atestado_path);
+        $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo);
         if ($result['status'] === 'success') {
             $filePath = public_path('storage/' . $result['data']['file_path']);
             return response()->download($filePath);

@@ -193,18 +193,7 @@
                     <label for="licenca_protocolo" class="form-label">Nº do Protocolo</label>
                     <input type="text" wire:model.defer="licenca_protocolo" class="form-control" id="licenca_protocolo">
                 </div>
-                <div class="mb-3">
-                    <label for="qrcode_atestado" class="form-label">QR Code do Atestado (imagem)</label>
-                    <input type="file" wire:model="qrcode_atestado" class="form-control" id="qrcode_atestado" accept="image/*">
-                    @if($qrcode_atestado)
-                        <div class="mt-2">
-                            <img src="{{ $qrcode_atestado->temporaryUrl() }}" alt="Prévia QRCode" style="max-width: 120px; max-height: 120px;">
-                        </div>
-                    @endif
-                    <div wire:loading wire:target="qrcode_atestado">
-                        <span class="text-info">Carregando imagem...</span>
-                    </div>
-                </div>
+                {{-- Removido campo de upload de QR Code do atestado, pois agora é gerado automaticamente --}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
