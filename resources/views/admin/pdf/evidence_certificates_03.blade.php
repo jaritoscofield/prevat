@@ -391,7 +391,7 @@
                                 <span style="color:red;">
                                     Certificado de Licenciamento<br>
                                     Nº {{ $licenca_numero ?? '' }}<br>
-                                    Validade: {{ $licenca_validade ?? '' }}<br>
+                                    Validade: {{ !empty($licenca_validade) ? \Carbon\Carbon::parse($licenca_validade)->format('d/m/Y') : '' }}<br>
                                     Nº do Protocolo: {{ $licenca_protocolo ?? '' }}
                                 </span>
                                     </th>
