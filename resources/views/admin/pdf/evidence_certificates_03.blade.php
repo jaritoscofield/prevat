@@ -15,7 +15,7 @@
 
 <div>
     {{-- Gera o ATESTADO apenas uma vez --}}
-    <div class="web-container">ajus
+    <div class="web-container">
         <table class="line-items-container">
             <thead>
             <tr>
