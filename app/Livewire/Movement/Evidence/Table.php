@@ -29,6 +29,7 @@ class Table extends Component
     public $licenca_protocolo;
     public $evidence_id_for_download;
     public $qrcode_atestado;
+    public $qrcode_atestado_path = null;
 
     #[On('filterTableEvidences')]
     public function filterTableEvidences($filterData = null)
@@ -98,15 +99,26 @@ class Table extends Component
         ], compact('evidence_id', 'licenca_numero', 'licenca_validade', 'licenca_protocolo', 'qrcode_atestado'));
     }
 
-    public function downloadPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado = null)
+    public function updatedQrcodeAtestado()
+    {
+        if ($this->qrcode_atestado) {
+            $evidence_id = $this->evidence_id_for_download ?? 'temp';
+            $dir = 'storage/evidences/'.$evidence_id.'/qrcodes';
+            $filename = 'qrcode_atestado_' . uniqid() . '.' . $this->qrcode_atestado->getClientOriginalExtension();
+            $this->qrcode_atestado->storeAs($dir, $filename, ['disk' => 'public']);
+            $this->qrcode_atestado_path = $dir . '/' . $filename;
+            \Log::info('Upload instantâneo do QRCode', ['path' => $this->qrcode_atestado_path]);
+        }
+    }
+
+    public function downloadPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo)
     {
         \Log::info('Livewire: downloadPDFCustom chamado', [
             'evidence_id' => $evidence_id,
-            'qrcode_atestado_type' => is_object($qrcode_atestado) ? get_class($qrcode_atestado) : gettype($qrcode_atestado),
-            'qrcode_atestado_exists' => $qrcode_atestado ? 'sim' : 'nao',
+            'qrcode_atestado_path' => $this->qrcode_atestado_path,
         ]);
         $evidenceRepository = new \App\Repositories\Movements\EvidenceRepository();
-        $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $qrcode_atestado);
+        $result = $evidenceRepository->generateCertificatesPDFCustom($evidence_id, $licenca_numero, $licenca_validade, $licenca_protocolo, $this->qrcode_atestado_path);
         if ($result['status'] === 'success') {
             $filePath = public_path('storage/' . $result['data']['file_path']);
             return response()->download($filePath);
