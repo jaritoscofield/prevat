@@ -1,9 +1,79 @@
 <div>
     <div class="row mb-3">
         <div class="col-12 text-end">
-            <a href="{{ route('dashboard.exportar-dados') }}" class="btn btn-primary" target="_blank">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exportModal">
                 <i class="fa fa-file-pdf-o"></i> Exportar dados
-            </a>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal de Exportação -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Exportar Relatório</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{ route('dashboard.exportar-dados') }}" method="GET" target="_blank">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="start_date" class="form-label">Data Inicial</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" 
+                                           value="{{ now()->startOfMonth()->format('Y-m-d') }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="end_date" class="form-label">Data Final</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" 
+                                           value="{{ now()->endOfMonth()->format('Y-m-d') }}" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="training_id" class="form-label">Treinamento (opcional)</label>
+                            <select class="form-control" id="training_id" name="training_id">
+                                <option value="">Todos os treinamentos</option>
+                                @foreach($trainings as $training)
+                                    <option value="{{ $training->id }}">{{ $training->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Seções a incluir:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="include_trainings" name="sections[]" value="trainings" checked>
+                                <label class="form-check-label" for="include_trainings">
+                                    Treinamentos ministrados
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="include_companies" name="sections[]" value="companies" checked>
+                                <label class="form-check-label" for="include_companies">
+                                    Empresas atendidas
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="include_extra_classes" name="sections[]" value="extra_classes" checked>
+                                <label class="form-check-label" for="include_extra_classes">
+                                    Turmas extras
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-download"></i> Gerar PDF
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
     <div class="row">

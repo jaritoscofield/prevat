@@ -30,14 +30,27 @@
             background: #e6eefa;
         }
         .small { font-size: 0.9em; color: #666; }
+        .filters { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-bottom: 20px; 
+        }
     </style>
 </head>
 <body>
     <h1>Exportação de Dados - Dashboard</h1>
     <p class="small">Período: {{ \Carbon\Carbon::parse($start)->format('d/m/Y') }} a {{ \Carbon\Carbon::parse($end)->format('d/m/Y') }}</p>
+    
+    @if(isset($training_filter))
+    <div class="filters">
+        <strong>Filtro aplicado:</strong> Treinamento: {{ $training_filter->name }}
+    </div>
+    @endif
 
+    @if(isset($trainings))
     <div class="section">
-        <h2>Treinamentos ministrados no mês</h2>
+        <h2>Treinamentos ministrados no período</h2>
         <div class="counter">{{ $trainings->count() }}</div>
         <span class="small">Ministrados</span>
         <table>
@@ -61,11 +74,13 @@
             </tbody>
         </table>
     </div>
+    @endif
 
+    @if(isset($companies))
     <div class="section">
-        <h2>Empresas atendidas no mês</h2>
+        <h2>Empresas atendidas no período</h2>
         <div class="counter">{{ $companies->count() }}</div>
-        <span class="small">No mês</span>
+        <span class="small">No período</span>
         <table>
             <thead>
                 <tr>
@@ -87,11 +102,13 @@
             </tbody>
         </table>
     </div>
+    @endif
 
+    @if(isset($turmasExtras))
     <div class="section">
-        <h2>Turmas extras no mês</h2>
+        <h2>Turmas extras no período</h2>
         <div class="counter">{{ $turmasExtras->count() }}</div>
-        <span class="small">No mês</span>
+        <span class="small">No período</span>
         <table>
             <thead>
                 <tr>
@@ -113,5 +130,6 @@
             </tbody>
         </table>
     </div>
+    @endif
 </body>
 </html> 

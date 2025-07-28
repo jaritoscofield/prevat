@@ -9,6 +9,15 @@ class Card extends Component
     public $trainingsMonth;
     public $companiesMonth;
     public $extraClassesMonth;
+    public $trainings;
+
+    public function mount()
+    {
+        $this->trainingsMonth = $this->getTrainingsMonth();
+        $this->companiesMonth = $this->getCompaniesMonth();
+        $this->extraClassesMonth = $this->getExtraClassesMonth();
+        $this->trainings = \App\Models\Training::orderBy('name')->get();
+    }
 
     public function render()
     {
