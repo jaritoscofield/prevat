@@ -7,6 +7,8 @@ use App\Repositories\Reports\TrainingReport;
 use App\Repositories\Reports\CompaniesReport;
 use App\Repositories\SchedulePrevatRepository;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DashboardExport;
 use Carbon\Carbon;
 
 class DashboardExportController extends Controller
@@ -18,6 +20,7 @@ class DashboardExportController extends Controller
         $end = $request->get('end_date', Carbon::now()->endOfMonth()->format('Y-m-d'));
         $trainingId = $request->get('training_id');
         $sections = $request->get('sections', ['trainings', 'companies', 'extra_classes']);
+        $format = $request->get('format', 'pdf');
 
         $dates = $start . ' to ' . $end;
 
@@ -45,20 +48,30 @@ class DashboardExportController extends Controller
 
         // Empresas atendidas (empresas com agendamento no período)
         if (in_array('companies', $sections)) {
-            if (isset($data['trainings'])) {
-                $companies = $data['trainings']->pluck('company')->unique('id');
-            } else {
-                // Se não tiver treinamentos, buscar empresas diretamente
-                $schedulePrevatRepo = new SchedulePrevatRepository();
-                $orderBy = ['column' => 'date_event', 'order' => 'DESC'];
-                $schedules = collect($schedulePrevatRepo->index($orderBy, null, null)['data'] ?? [])
-                    ->filter(function($item) use ($start, $end, $trainingId) {
-                        $dateMatch = $item->date_event >= $start && $item->date_event <= $end;
-                        $trainingMatch = !$trainingId || optional($item->training)->id == $trainingId;
-                        return $dateMatch && $trainingMatch;
-                    });
-                $companies = $schedules->pluck('company')->unique('id');
+            $companies = \App\Models\ScheduleCompany::withoutGlobalScopes()
+                ->whereHas('schedule', function($query) use ($start, $end) {
+                    $query->where('status', 'Concluído')
+                          ->whereBetween('date_event', [$start, $end]);
+                })
+                ->with('company')
+                ->get()
+                ->pluck('company')
+                ->unique('id');
+            
+            // Filtrar por treinamento específico se selecionado
+            if ($trainingId) {
+                $companies = $companies->filter(function($company) use ($start, $end, $trainingId) {
+                    return \App\Models\ScheduleCompany::withoutGlobalScopes()
+                        ->where('company_id', $company->id)
+                        ->whereHas('schedule', function($query) use ($start, $end, $trainingId) {
+                            $query->where('status', 'Concluído')
+                                  ->whereBetween('date_event', [$start, $end])
+                                  ->where('training_id', $trainingId);
+                        })
+                        ->exists();
+                });
             }
+            
             $data['companies'] = $companies;
         }
 
@@ -76,7 +89,14 @@ class DashboardExportController extends Controller
             $data['turmasExtras'] = $turmasExtras;
         }
 
-        $pdf = Pdf::loadView('admin.pdf.dashboard_export', $data);
-        return $pdf->download('dashboard_export_' . Carbon::parse($start)->format('Y_m_d') . '_to_' . Carbon::parse($end)->format('Y_m_d') . '.pdf');
+        $filename = 'dashboard_export_' . Carbon::parse($start)->format('Y_m_d') . '_to_' . Carbon::parse($end)->format('Y_m_d');
+
+        if ($format === 'excel') {
+            return Excel::download(new DashboardExport($data), $filename . '.xlsx');
+        } else {
+            $pdf = Pdf::loadView('admin.pdf.dashboard_export', $data);
+            $pdf->setPaper('a4', 'landscape');
+            return $pdf->download($filename . '.pdf');
+        }
     }
 } 

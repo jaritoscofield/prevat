@@ -65,17 +65,62 @@
                                 </label>
                             </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Formato de exportação:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="format_pdf" name="format" value="pdf" checked>
+                                <label class="form-check-label" for="format_pdf">
+                                    <i class="fa fa-file-pdf-o"></i> PDF
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="format_excel" name="format" value="excel">
+                                <label class="form-check-label" for="format_excel">
+                                    <i class="fa fa-file-excel-o"></i> Excel
+                                </label>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-download"></i> Gerar PDF
+                        <button type="submit" class="btn btn-primary" id="exportButton">
+                            <i class="fa fa-download"></i> <span id="exportText">Gerar PDF</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formatRadios = document.querySelectorAll('input[name="format"]');
+            const exportButton = document.getElementById('exportButton');
+            const exportText = document.getElementById('exportText');
+            const exportIcon = exportButton.querySelector('i');
+
+            function updateButtonText() {
+                const selectedFormat = document.querySelector('input[name="format"]:checked').value;
+                
+                if (selectedFormat === 'excel') {
+                    exportText.textContent = 'Gerar Excel';
+                    exportIcon.className = 'fa fa-file-excel-o';
+                } else {
+                    exportText.textContent = 'Gerar PDF';
+                    exportIcon.className = 'fa fa-file-pdf-o';
+                }
+            }
+
+            // Atualizar quando a página carrega
+            updateButtonText();
+
+            // Atualizar quando o usuário muda a seleção
+            formatRadios.forEach(radio => {
+                radio.addEventListener('change', updateButtonText);
+            });
+        });
+    </script>
     <div class="row">
         <!-- Card: Treinamentos ministrados no mês -->
         <div class="col-12 col-md-4 mb-3">

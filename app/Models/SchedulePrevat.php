@@ -48,4 +48,9 @@ class SchedulePrevat extends Model
     {
         return $this->belongsTo(Company::class, 'contractor_id');
     }
+
+    public function scheduleCompanies()
+    {
+        return $this->hasMany(ScheduleCompany::class, 'schedule_prevat_id');
+    }
 }
