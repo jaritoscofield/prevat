@@ -168,6 +168,9 @@ Route::middleware([
     Route::view('relatorios/empresas', 'admin.report.companies.index')->name('report.companies.index');
     Route::view('relatorios/treinamentos-empresas', 'admin.report.trainings.index')->name('report.trainings.index');
 
+    //Auditoria
+    Route::view('auditoria', 'admin.audit.index')->name('audit.index');
+
     //Segurança do Trabalho
     Route::view('seguranca-do-trabalho/inspecoes', 'admin.work-safety.inspection.index')->name('work-safety.inspection.index');
     Route::view('seguranca-do-trabalho/inspecoes/novo', 'admin.work-safety.inspection.create')->name('work-safety.inspection.create');

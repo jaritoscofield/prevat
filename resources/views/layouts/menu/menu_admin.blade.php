@@ -213,6 +213,64 @@
             </ul>
         </li>
 
+        <li class="slide @if(request()->is('relatorios/*')) is-expanded @endif">
+            <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                    class="side-menu__icon fa-solid fa-file-invoice"></i><span
+                    class="side-menu__label">Relatórios</span><i
+                    class="angle fe fe-chevron-right"></i></a>
+            <ul class="slide-menu mega-slide-menu">
+                <li class="panel sidetab-menu">
+                    <div class="panel-body tabs-menu-body p-0 border-0">
+                        <div class="tab-content">
+                            <div class="tab-pane active" >
+                                <ul class="sidemenu-list">
+                                    <li class="side-menu-label1"><a href="javascript:void(0)">Relatórios</a></li>
+                                    <li class="mega-menu">
+                                        <div class="">
+                                            <ul>
+                                                <li><a href="{{route('report.participant-training.index')}}" class="slide-item @if(request()->is('relatorios/treinamentos-do-participante*')) active @endif"> Treinamento do participante</a></li>
+                                                <li><a href="{{route('report.companies.index')}}" class="slide-item @if(request()->is('relatorios/empresas*')) active @endif"> Empresas</a></li>
+                                                <li><a href="{{route('report.trainings.index')}}" class="slide-item @if(request()->is('relatorios/treinamentos*')) active @endif"> Treinamentos</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+
+        @if(auth()->user()->email === 'financeiro@prevat.com.br')
+        <li class="slide @if(request()->is('auditoria*')) is-expanded @endif">
+            <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
+                    class="side-menu__icon fe fe-search"></i><span
+                    class="side-menu__label">Auditoria</span><i
+                    class="angle fe fe-chevron-right"></i></a>
+            <ul class="slide-menu mega-slide-menu">
+                <li class="panel sidetab-menu">
+                    <div class="panel-body tabs-menu-body p-0 border-0">
+                        <div class="tab-content">
+                            <div class="tab-pane active" >
+                                <ul class="sidemenu-list">
+                                    <li class="side-menu-label1"><a href="javascript:void(0)">Auditoria</a></li>
+                                    <li class="mega-menu">
+                                        <div class="">
+                                            <ul>
+                                                <li><a href="{{route('audit.index')}}" class="slide-item @if(request()->is('auditoria*')) active @endif"> Dashboard de Auditoria</a></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </li>
+        @endif
+
         <li class="slide @if(request()->is('seguranca-do-trabalho/*'))is-expanded @endif">
             <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
                     class="side-menu__icon fa-solid fa-screwdriver-wrench"></i><span
@@ -229,35 +287,6 @@
                                         <div class="">
                                             <ul>
                                                 <li><a href="{{route('work-safety.inspection.index')}}" class="slide-item @if(request()->is('seguranca-do-trabalho/*')) active @endif"> Inspeções </a></li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </li>
-
-        <li class="slide @if(request()->is('relatorios/*'))is-expanded @endif">
-            <a class="side-menu__item" data-bs-toggle="slide" href="javascript:void(0)"><i
-                    class="side-menu__icon fa-solid fa-file-invoice"></i><span
-                    class="side-menu__label">Relatórios</span><i
-                    class="angle fe fe-chevron-right"></i></a>
-            <ul class="slide-menu mega-slide-menu">
-                <li class="panel sidetab-menu">
-                    <div class="panel-body tabs-menu-body p-0 border-0">
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="side9">
-                                <ul class="sidemenu-list">
-                                    <li class="side-menu-label1"><a href="javascript:void(0)">Relatórios</a></li>
-                                    <li class="mega-menu">
-                                        <div class="">
-                                            <ul>
-                                                <li><a href="{{route('report.participant-training.index')}}" class="slide-item @if(request()->is('relatorios/treinamentos-do-participante*')) active @endif"> Treinamento do participante</a></li>
-                                                <li><a href="{{route('report.companies.index')}}" class="slide-item @if(request()->is('relatorios/empresas*')) active @endif"> Empresas</a></li>
-                                                <li><a href="{{route('report.trainings.index')}}" class="slide-item @if(request()->is('relatorios/treinamentos*')) active @endif"> Treinamentos</a></li>
                                             </ul>
                                         </div>
                                     </li>
