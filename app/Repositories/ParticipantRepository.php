@@ -80,6 +80,16 @@ class ParticipantRepository
         try {
             DB::beginTransaction();
 
+            // Handle base64 signature if present
+            if (!empty($request['signature'])) {
+                Storage::disk('public')->makeDirectory('signatures');
+                $path = 'signatures/participant_' . uniqid() . '.png';
+                $base64 = $request['signature'];
+                $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64));
+                Storage::disk('public')->put($path, $image);
+                $requestValidated['signature_image'] = $path;
+            }
+
             $participantDB = Participant::query()->create($requestValidated);
 
             DB::commit();
@@ -114,14 +124,24 @@ class ParticipantRepository
             if(Auth::user()->company->type == 'admin') {
                 $participantDB->withoutGlobalScopes();
             }
-            $participantDB->findOrFail($id);
+            $model = $participantDB->findOrFail($id);
 
-            $participantDB->update($requestValidated);
+            // Handle base64 signature if present
+            if (!empty($request['signature'])) {
+                Storage::disk('public')->makeDirectory('signatures');
+                $path = 'signatures/participant_' . uniqid() . '.png';
+                $base64 = $request['signature'];
+                $image = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64));
+                Storage::disk('public')->put($path, $image);
+                $requestValidated['signature_image'] = $path;
+            }
+
+            $model->update($requestValidated);
 
             DB::commit();
             return [
                 'status' => 'success',
-                'data' => $participantDB,
+                'data' => $model,
                 'code' => 200,
                 'message' => 'Participante atualizado com sucesso !'
             ];

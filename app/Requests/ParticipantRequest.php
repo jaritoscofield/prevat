@@ -27,6 +27,7 @@ class ParticipantRequest
             'contract_id' => [
                 Rule::requiredIf(fn () => auth()->user()->company->type == 'admin'),
             ],
+            'signature' => 'sometimes|nullable|string',
         ]);
         return $validator;
     }

@@ -6,6 +6,8 @@ use App\Repositories\CompanyContractRepository;
 use App\Repositories\CompanyRepository;
 use App\Repositories\ParticipantRepository;
 use App\Repositories\ParticipantRoleRepository;
+use App\Models\Participant;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class Form extends Component
@@ -46,6 +48,28 @@ class Form extends Component
         } else if ($participantReturnDB['status'] == 'error') {
             return redirect()->route('registration.participant')->with($participantReturnDB['status'], $participantReturnDB['message']);
         }
+    }
+
+    public function removeSignature()
+    {
+        if (!$this->participant) {
+            return;
+        }
+
+        $currentPath = $this->participant->signature_image ?? null;
+        if ($currentPath && Storage::disk('public')->exists($currentPath)) {
+            Storage::disk('public')->delete($currentPath);
+        }
+
+        $model = Participant::query()->find($this->participant->id);
+        if ($model) {
+            $model->update(['signature_image' => null]);
+            $this->participant = $model->fresh();
+        }
+
+        // Reflect immediately in state/UI
+        $this->state['signature'] = null;
+        session()->flash('success', 'Assinatura removida com sucesso!');
     }
 
     public function update()

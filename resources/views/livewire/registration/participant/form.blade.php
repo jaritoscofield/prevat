@@ -126,19 +126,28 @@
                         </div>
 
                         <!-- Campo de Assinatura -->
-                        <!-- <div class="row mb-4">
-                            <div class="col-md-12 col-xl-6">
+                        <div class="row mb-4">
+                            <div class="col-12">
                                 <label class="form-label">Assinatura</label>
-                                <div style="border:1px solid #ccc; border-radius:4px; position:relative;">
-                                    <canvas id="signature-pad" width="400" height="150" style="touch-action: none; background: #fff;"></canvas>
+                                <div id="signature-container" style="border:1px solid #ccc; border-radius:4px; position:relative; width:100%;">
+                                    <canvas id="signature-pad" style="touch-action: none; background: #fff; width:100%; height:200px;"></canvas>
                                     <input type="hidden" wire:model="state.signature" id="signature-input">
                                 </div>
                                 <button type="button" class="btn btn-sm btn-secondary mt-2" id="clear-signature">Limpar Assinatura</button>
                                 @error('signature')
                                 <p class="text-danger">{{ $message }}</p>
                                 @enderror
+                                @if(isset($participant) && $participant['signature_image'])
+                                    <div class="mt-3">
+                                        <div class="form-label">Assinatura atual</div>
+                                        <img alt="signature" class="img-responsive br-7" style="max-height:150px" src="{{ asset('storage/' . $participant['signature_image']) }}">
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-danger" wire:click="removeSignature">Remover assinatura</button>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
-                        </div> -->
+                        </div>
 
                         <button type="submit" class="btn btn-primary"> {{$participant ? 'Atualizar' : 'Cadastrar'}}</button>
                     </form>
@@ -178,6 +187,22 @@
             let drawing = false;
             let lastPos = { x: 0, y: 0 };
 
+            function resizeCanvas() {
+                const container = document.getElementById('signature-container');
+                if (!container) return;
+                const ratio = window.devicePixelRatio || 1;
+                const displayWidth = container.clientWidth;
+                const displayHeight = 200; // matches CSS height
+                canvas.width = Math.floor(displayWidth * ratio);
+                canvas.height = Math.floor(displayHeight * ratio);
+                canvas.style.width = displayWidth + 'px';
+                canvas.style.height = displayHeight + 'px';
+                ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+            }
+            // init and on resize
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
             function getMousePos(canvas, evt) {
                 let rect = canvas.getBoundingClientRect();
                 return {
@@ -214,9 +239,7 @@
             canvas.addEventListener('mouseup', function() {
                 drawing = false;
                 signatureInput.value = canvas.toDataURL();
-                if (window.Livewire) {
-                    window.Livewire.find(document.querySelector('[wire\:id]').getAttribute('wire:id')).set('state.signature', signatureInput.value);
-                }
+                signatureInput.dispatchEvent(new Event('input'));
             });
             canvas.addEventListener('mouseleave', function() {
                 drawing = false;
@@ -236,16 +259,12 @@
             canvas.addEventListener('touchend', function() {
                 drawing = false;
                 signatureInput.value = canvas.toDataURL();
-                if (window.Livewire) {
-                    window.Livewire.find(document.querySelector('[wire\:id]').getAttribute('wire:id')).set('state.signature', signatureInput.value);
-                }
+                signatureInput.dispatchEvent(new Event('input'));
             });
             document.getElementById('clear-signature').addEventListener('click', function() {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 signatureInput.value = '';
-                if (window.Livewire) {
-                    window.Livewire.find(document.querySelector('[wire\:id]').getAttribute('wire:id')).set('state.signature', '');
-                }
+                signatureInput.dispatchEvent(new Event('input'));
             });
         }
     </script>

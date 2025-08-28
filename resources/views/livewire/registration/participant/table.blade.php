@@ -25,6 +25,7 @@
                             <thead class="text-dark">
                             <tr>
                                 <th class="fw-semibold">Nome</th>
+                                <th class="fw-semibold" width="80">Assinatura</th>
                                 <th class="fw-semibold">Documentos</th>
                                 @if(auth()->user()->company->type == 'admin')
                                 <th class="fw-semibold">Empresa</th>
@@ -47,6 +48,11 @@
                                                 <span class="text-muted fw-semibold fs-12"> {{$itemParticipant['role']['name']}}</span>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td class="text-center">
+                                        @if(!empty($itemParticipant['signature_image']))
+                                            <img alt="signature" style="height:40px;" src="{{ asset('storage/' . $itemParticipant['signature_image']) }}">
+                                        @endif
                                     </td>
                                     <td class="fw-semibold text-muted-dark text-nowrap">
                                         <span class="text-muted fw-semibold fs-12">CPF : {{ $itemParticipant['taxpayer_registration'] }}</span><br>

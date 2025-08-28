@@ -11,7 +11,7 @@ class Participant extends Model
 {
     use HasFactory, CompanyTrait;
 
-    protected $fillable = ['company_id', 'contract_id', 'participant_role_id', 'name', 'email', 'identity_registration', 'contract', 'taxpayer_registration', 'driving_license', 'status'];
+    protected $fillable = ['company_id', 'contract_id', 'participant_role_id', 'name', 'email', 'identity_registration', 'contract', 'taxpayer_registration', 'driving_license', 'status', 'signature_image'];
 
     public function company()
     {
