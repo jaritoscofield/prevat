@@ -9,6 +9,7 @@ use Livewire\Component;
 class Filter extends Component
 {
     public $filter = [
+        'search' => '',
         'date_event' => '',
         'company_id' => '',
         'schedule_prevat_id' => ''

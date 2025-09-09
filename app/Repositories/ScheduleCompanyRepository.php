@@ -20,10 +20,19 @@ class ScheduleCompanyRepository
     public function index($orderBy = null, $filterData = null, $pageSize = null)
     {
         try {
-            $scheduleCompanyDB = ScheduleCompany::query()->with(['schedule.training', 'schedule.location', 'schedule.room', 'schedule.first_time', 'schedule.second_time', 'company', 'participants']);
+            $scheduleCompanyDB = ScheduleCompany::query()->with(['schedule.training', 'schedule.location', 'schedule.room', 'schedule.first_time', 'schedule.second_time', 'company', 'participants.participant']);
 
+            // Apenas admins podem ver todas as agendas
             if(Auth::user()->company->type == 'admin') {
                 $scheduleCompanyDB->withoutGlobalScopes();
+            } else {
+                // Para usuários client/contractor: garantir que vejam apenas suas próprias agendas
+                $scheduleCompanyDB->where('company_id', Auth::user()->company->id);
+                
+                // Se o usuário tem contract_id, filtrar também por contrato
+                if(Auth::user()->contract_id) {
+                    $scheduleCompanyDB->where('contract_id', Auth::user()->contract_id);
+                }
             }
 
             // CORRIGIDO: Agrupar busca textual em um único where aninhado para funcionar junto com o filtro de empresa
@@ -33,8 +42,14 @@ class ScheduleCompanyRepository
                         $q->where('name', 'LIKE', '%'.$filterData['search'].'%')
                           ->orWhere('acronym', 'LIKE', '%'.$filterData['search'].'%');
                     })
-                    ->orWhereHas('participants.participant', function($q) use ($filterData){
-                        $q->where('name', 'LIKE', '%'.$filterData['search'].'%');
+                    ->orWhereHas('participants', function($q) use ($filterData){
+                        $q->whereHas('participant', function($subQ) use ($filterData){
+                            $subQ->withoutGlobalScopes()->where('name', 'LIKE', '%'.$filterData['search'].'%');
+                        });
+                    })
+                    ->orWhereHas('company', function($q) use ($filterData){
+                        $q->where('name', 'LIKE', '%'.$filterData['search'].'%')
+                          ->orWhere('fantasy_name', 'LIKE', '%'.$filterData['search'].'%');
                     });
                 });
             }
