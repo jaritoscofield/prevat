@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Movement\SchedulePrevat;
 
+use App\Repositories\CompanyRepository;
 use App\Repositories\ContractorsRepository;
 use App\Repositories\SchedulePrevatRepository;
 use App\Repositories\TimeRepository;
@@ -30,6 +31,7 @@ class Form extends Component
         'time02_id' => null,
         'team_id' => null,
         'contractor_id' => null,
+        'company_id' => '',
         'type' => ''
     ];
     public $schedulePrevat;
@@ -120,6 +122,12 @@ class Form extends Component
         return $contractorRepository->getSelectContractor();
     }
 
+    public function getSelectCompanies()
+    {
+        $companyRepository = new CompanyRepository();
+        return $companyRepository->getSelectCompany();
+    }
+
     public function render()
     {
         $response = new \stdClass();
@@ -130,6 +138,7 @@ class Form extends Component
         $response->times = $this->getSelectTimes();
         $response->teams = $this->getSelectTeams();
         $response->contractors = $this->getSelectContractors();
+        $response->companies = $this->getSelectCompanies();
 
         return view('livewire.movement.schedule-prevat.form', ['response' => $response]);
     }

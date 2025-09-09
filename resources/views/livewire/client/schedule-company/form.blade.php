@@ -23,7 +23,7 @@
                     <form wire:submit="save" class="form-horizontal mt-5">
 
                         <div class="row">
-                            <div class="col-md-12 col-xl-12">
+                            <div class="col-md-12 col-xl-6">
                                 <div class="form-group">
                                     <label class="form-label">Eventos</label>
                                     <x-select2 wire:model.live="state.schedule_prevat_id" class="form-select select2 select2-show-search">
@@ -33,6 +33,21 @@
                                         @endforeach
                                     </x-select2>
                                     @error('schedule_prevat_id')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-xl-6">
+                                <div class="form-group">
+                                    <label class="form-label">Empresa</label>
+                                    <x-select2 wire:model="state.company_id" class="form-select select2 select2-show-search">
+                                        @foreach($response->companies as $itemCompany)
+                                            <option value="{{$itemCompany['value']}}" @if(isset($scheduleCompany) && $scheduleCompany['company_id'] == $itemCompany['value']) selected @endif>
+                                                {{$itemCompany['label']}}
+                                            </option>
+                                        @endforeach
+                                    </x-select2>
+                                    @error('company_id')
                                     <p class="text-danger">{{ $message }}</p>
                                     @enderror
                                 </div>

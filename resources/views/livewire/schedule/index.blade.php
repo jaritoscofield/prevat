@@ -9,7 +9,10 @@
 
 
         @if(auth()->user()->company->type == 'admin')
-            @livewire('components.selects.contracts.form')
+            <div class="d-flex align-items-end gap-3">
+                @livewire('components.selects.contracts.form')
+                @livewire('components.selects.companies.form')
+            </div>
         @endif
 
 

@@ -13,6 +13,7 @@ class Card extends Component
 {
     public $date;
     public $contractor_id;
+    public $company_id;
 
     public function mount()
     {
@@ -30,6 +31,12 @@ class Card extends Component
     public function filterScheduleTrainingByContractor($contractor_id = null)
     {
         $this->contractor_id = $contractor_id;
+    }
+
+    #[On('filterScheduleTrainingByCompany')]
+    public function filterScheduleTrainingByCompany($company_id = null)
+    {
+        $this->company_id = $company_id;
     }
 
     public function getSchedule()
@@ -62,6 +69,10 @@ class Card extends Component
 
                 if($this->contractor_id != null && Auth::user()->company->type == 'admin') {
                     $schedulePrevatDB->where('contractor_id',  $this->contractor_id);
+                }
+
+                if($this->company_id != null && Auth::user()->company->type == 'admin') {
+                    $schedulePrevatDB->where('company_id',  $this->company_id);
                 }
 
                 $schedulePrevatDB = $schedulePrevatDB->first();

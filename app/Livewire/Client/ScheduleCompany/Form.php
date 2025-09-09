@@ -4,6 +4,7 @@ namespace App\Livewire\Client\ScheduleCompany;
 
 use App\Models\Participant;
 use App\Models\ScheduleCompanyParticipants;
+use App\Repositories\CompanyRepository;
 use App\Repositories\ParticipantRepository;
 use App\Repositories\ScheduleCompanyRepository;
 use App\Repositories\SchedulePrevatRepository;
@@ -162,10 +163,17 @@ class Form extends Component
         return  $schedulePrevatRepository->getSelectSchedulePrevat('Em Aberto');
     }
 
+    public function getSelectCompanies()
+    {
+        $companyRepository = new CompanyRepository();
+        return $companyRepository->getSelectCompany();
+    }
+
     public function render()
     {
         $response = new \stdClass();
         $response->schedulePrevats = $this->getSelectSchedulePrevat();
+        $response->companies = $this->getSelectCompanies();
         $response->event = $this->getTrainement();
 
         return view('livewire.client.schedule-company.form', ['response' => $response]);

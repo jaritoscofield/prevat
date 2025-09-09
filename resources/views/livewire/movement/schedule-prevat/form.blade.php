@@ -166,6 +166,21 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-12 col-xl-4">
+                                <div class="form-group">
+                                    <label class="form-label">Empresa</label>
+                                    <x-select2 wire:model="state.company_id" class="form-control form-select select2 select2-show-search">
+                                        @foreach($response->companies as $itemCompany)
+                                            <option value="{{$itemCompany['value']}}" @if(isset($schedulePrevat) && $schedulePrevat['company_id'] == $itemCompany['value']) selected @endif>
+                                                {{$itemCompany['label']}}</option>
+                                        @endforeach
+                                    </x-select2>
+                                    @error('company_id')
+                                    <p class="text-danger">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
                             <div class="col-md-12 col-xl-2">
                                 <div class="form-group">
                                     <label class="form-label">Turma</label>

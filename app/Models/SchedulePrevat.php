@@ -9,7 +9,7 @@ class SchedulePrevat extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['reference', 'training_id', 'workload_id', 'training_room_id', 'training_local_id', 'time01_id', 'time02_id', 'team_id', 'contractor_id', 'date_event', 'start_event',
+    protected $fillable = ['reference', 'training_id', 'workload_id', 'training_room_id', 'training_local_id', 'time01_id', 'time02_id', 'team_id', 'contractor_id', 'company_id', 'date_event', 'start_event',
         'end_event', 'days', 'vacancies', 'vacancies_available', 'vacancies_occupied', 'absences', 'file_presence', 'file_programmatic', 'status', 'type'];
 
     public function training()
@@ -47,6 +47,11 @@ class SchedulePrevat extends Model
     public function contractor()
     {
         return $this->belongsTo(Company::class, 'contractor_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function scheduleCompanies()
